@@ -3,6 +3,10 @@ include:
   - redirector/compose.yaml
   - shortener/compose.yaml
 
+volumes:
+  shortenerLogging:
+  redirectorLogging:
+
 secrets:
   db_ca_crt:
     file: services/database/ca.crt

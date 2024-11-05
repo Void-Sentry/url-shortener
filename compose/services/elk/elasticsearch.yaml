@@ -7,6 +7,6 @@ services:
       - xpack.license.self_generated.type=basic
       - "ES_JAVA_OPTS=-Xms2g -Xmx2g"
     networks:
-      - rakeBackend
+      - elknet
     volumes:
-      - ../data/elasticsearch:/data
+      - ./data/elasticsearch:/data

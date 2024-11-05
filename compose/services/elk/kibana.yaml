@@ -11,7 +11,7 @@ services:
       - SERVER_BASEPATH=/kibana
       - SERVER_REWRITEBASEPATH=true
     networks:
-      - rakeBackend
+      - elknet
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.kibana.rule=Host(`${HOST}`) && PathPrefix(`/kibana`)"

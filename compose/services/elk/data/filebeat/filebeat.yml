@@ -1,0 +1,22 @@
+setup.kibana.host: "kibana:5601"
+setup.kibana.protocol: "http"
+
+filebeat.inputs:
+  - type: filestream
+    scan_frequency: 1s
+    enabled: true
+    parsers:
+      - ndjson:
+          overwrite_keys: true
+          message_key: 'message'
+    paths:
+      - /shortener/logs/*.log
+      - /redirector/logs/*.log
+
+output.logstash:
+  hosts: ["logstash:5044"]
+
+# output.elasticsearch:
+#   hosts: ["elasticsearch:9200"]
+#   username: "elastic"
+#   password: "Dp1MIVRNceBKuEXR3dVm"

@@ -1,0 +1,12 @@
+services:
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:8.14.2
+    volumes:
+      - shortenerLogging:/shortener/logs
+      - redirectorLogging:/redirector/logs
+      - ./data/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml
+    networks:
+      - elknet
+    depends_on:
+      - elasticsearch
+      - logstash
