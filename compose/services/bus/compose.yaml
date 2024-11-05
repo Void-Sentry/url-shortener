@@ -10,7 +10,7 @@ services:
     volumes:
       - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
     networks:
-      - rabbitnet
+      - busnet
 
   rabbitmq1:
     image: rabbitmq:3.11-management
@@ -22,7 +22,7 @@ services:
       RABBITMQ_DEFAULT_PASS: 'admin'
       RABBITMQ_DEFAULT_VHOST: '/'
     networks:
-      - rabbitnet
+      - busnet
     entrypoint: ['sh', '/usr/local/bin/cluster-entrypoint.sh']
     volumes:
       - rabbit1:/var/lib/rabbitmq
@@ -42,7 +42,7 @@ services:
     depends_on:
       - rabbitmq1
     networks:
-      - rabbitnet
+      - busnet
     entrypoint: ['sh', '/usr/local/bin/cluster-entrypoint.sh']
     volumes:
       - rabbit2:/var/lib/rabbitmq
@@ -63,7 +63,7 @@ services:
       - rabbitmq1
       - rabbitmq2
     networks:
-      - rabbitnet
+      - busnet
     entrypoint: ['sh', '/usr/local/bin/cluster-entrypoint.sh']
     volumes:
       - rabbit3:/var/lib/rabbitmq

@@ -3,6 +3,25 @@ include:
   - redirector/compose.yaml
   - shortener/compose.yaml
 
+secrets:
+  db_ca_crt:
+    file: services/database/ca.crt
+
+  db_client_root_key:
+    file: services/database/clients/root/client.root.key
+  db_client_root_crt:
+    file: services/database/clients/root/client.root.crt
+
+  db_client_zitadel_key:
+    file: services/database/clients/zitadel/client.zitadel.key
+  db_client_zitadel_crt:
+    file: services/database/clients/zitadel/client.zitadel.crt
+
+  db_client_shortener_key:
+    file: services/database/clients/shortener/client.shortener.key
+  db_client_shortener_crt:
+    file: services/database/clients/shortener/client.shortener.crt
+
 networks:
   usnet:
     driver: bridge

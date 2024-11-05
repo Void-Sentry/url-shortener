@@ -18,25 +18,50 @@ services:
     volumes:
       - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
     networks:
-      - dbnet1
-      - dbnet2
-      - dbnet3
+      - dbnet
 
   roach1:
     image: cockroachdb/cockroach:v24.2.1
     networks:
-      - dbnet1
-      - dbnet2
-      - dbnet3
+      - dbnet
     command: [
       'start',
       '--advertise-addr=roach1:26357',
       '--http-addr=roach1:8080',
       '--listen-addr=roach1:26357',
       '--sql-addr=roach1:26257',
-      '--insecure',
+      '--cache=.25',
+      '--max-sql-memory=.25',
+      '--logtostderr',
+      '--certs-dir=/run/secrets',
       '--join=roach1:26357,roach2:26357,roach3:26357',
     ]
+    secrets:
+      - source: db_ca_crt
+        target: ca.crt
+      - source: db_node1_key
+        target: node.key
+        mode: 0600
+      - source: db_node1_crt
+        target: node.crt
+
+      - source: db_client_root_key
+        target: client.root.key
+        mode: 0600
+      - source: db_client_root_crt
+        target: client.root.crt
+
+      - source: db_client_zitadel_key
+        target: client.zitadel.key
+        mode: 0600
+      - source: db_client_zitadel_crt
+        target: client.zitadel.crt
+
+      - source: db_client_shortener_key
+        target: client.shortener.key
+        mode: 0600
+      - source: db_client_shortener_crt
+        target: client.shortener.crt
     volumes:
       - dbdata1:/cockroach/cockroach-data
 
@@ -45,18 +70,42 @@ services:
     depends_on:
       - roach1
     networks:
-      - dbnet1
-      - dbnet2
-      - dbnet3
+      - dbnet
     command: [
       'start',
       '--advertise-addr=roach2:26357',
       '--http-addr=roach2:8080',
       '--listen-addr=roach2:26357',
       '--sql-addr=roach2:26257',
-      '--insecure',
+      '--cache=.25',
+      '--max-sql-memory=.25',
+      '--logtostderr',
+      '--certs-dir=/run/secrets',
       '--join=roach1:26357,roach2:26357,roach3:26357',
     ]
+    secrets:
+      - source: db_ca_crt
+        target: ca.crt
+      - source: db_node2_key
+        target: node.key
+        mode: 0600
+      - source: db_node2_crt
+        target: node.crt
+      - source: db_client_root_key
+        target: client.root.key
+        mode: 0600
+      - source: db_client_root_crt
+        target: client.root.crt
+      - source: db_client_zitadel_key
+        target: client.zitadel.key
+        mode: 0600
+      - source: db_client_zitadel_crt
+        target: client.zitadel.crt
+      - source: db_client_shortener_key
+        target: client.shortener.key
+        mode: 0600
+      - source: db_client_shortener_crt
+        target: client.shortener.crt
     volumes:
       - dbdata2:/cockroach/cockroach-data
 
@@ -66,17 +115,54 @@ services:
       - roach1
       - roach2
     networks:
-      - dbnet1
-      - dbnet2
-      - dbnet3
+      - dbnet
     command: [
       'start',
       '--advertise-addr=roach3:26357',
       '--http-addr=roach3:8080',
       '--listen-addr=roach3:26357',
       '--sql-addr=roach3:26257',
-      '--insecure',
+      '--cache=.25',
+      '--max-sql-memory=.25',
+      '--logtostderr',
+      '--certs-dir=/run/secrets',
       '--join=roach1:26357,roach2:26357,roach3:26357',
     ]
+    secrets:
+      - source: db_ca_crt
+        target: ca.crt
+      - source: db_node3_key
+        target: node.key
+        mode: 0600
+      - source: db_node3_crt
+        target: node.crt
+      - source: db_client_root_crt
+        target: client.root.crt
+      - source: db_client_zitadel_key
+        target: client.zitadel.key
+        mode: 0600
+      - source: db_client_zitadel_crt
+        target: client.zitadel.crt
+      - source: db_client_shortener_key
+        target: client.shortener.key
+        mode: 0600
+      - source: db_client_shortener_crt
+        target: client.shortener.crt
     volumes:
       - dbdata3:/cockroach/cockroach-data
+
+secrets:
+  db_node1_key:
+    file: node1/certs/node.key
+  db_node1_crt:
+    file: node1/certs/node.crt
+
+  db_node2_key:
+    file: node2/certs/node.key
+  db_node2_crt:
+    file: node2/certs/node.crt
+
+  db_node3_key:
+    file: node3/certs/node.key
+  db_node3_crt:
+    file: node3/certs/node.crt

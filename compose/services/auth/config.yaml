@@ -12,15 +12,15 @@ Database:
       Password: ""
       SSL:
         Mode: "verify-full"
-        RootCert: "/certs/ca.crt"
-        Cert: "/certs/client.zitadel.crt"
-        Key: "/certs/client.zitadel.key"
+        RootCert: "/run/secrets/ca.crt"
+        Cert: "/run/secrets/client.zitadel.crt"
+        Key: "/run/secrets/client.zitadel.key"
     Admin:
       Username: root
       Password: ""
       SSL:
         Mode: "verify-full"
-        RootCert: "/certs/ca.crt"
-        Cert: "/certs/client.root.crt"
-        Key: "/certs/client.root.key"
+        RootCert: "/run/secrets/ca.crt"
+        Cert: "/run/secrets/client.root.crt"
+        Key: "/run/secrets/client.root.key"
 

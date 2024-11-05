@@ -2,6 +2,19 @@ services:
   zitadel:
     image: 'ghcr.io/zitadel/zitadel:latest'
     command: 'start-from-init --config /config.yaml --masterkey "BivzmFKQeGFFEZnUiRrhUTDfYVPdwCea"'
+    secrets:
+      - source: db_ca_crt
+        target: ca.crt
+      - source: db_client_root_key
+        target: client.root.key
+        mode: 0600
+      - source: db_client_root_crt
+        target: client.root.crt
+      - source: db_client_zitadel_key
+        target: client.zitadel.key
+        mode: 0600
+      - source: db_client_zitadel_crt
+        target: client.zitadel.crt
     env_file:
       - .env
     deploy:
@@ -13,20 +26,19 @@ services:
         condition: on-failure
     volumes:
       - ./config.yaml:/config.yaml
-      - ./certs/ca.crt:/certs/ca.crt
-      - ./certs/client.root.crt:/certs/client.root.crt
-      - ./certs/client.root.key:/certs/client.root.key
-      - ./certs/client.zitadel.crt:/certs/client.zitadel.crt
-      - ./certs/client.zitadel.key:/certs/client.zitadel.key
+      # - ./certs/ca.crt:/certs/ca.crt
+      # - ./certs/client.root.crt:/certs/client.root.crt
+      # - ./certs/client.root.key:/certs/client.root.key
+      # - ./certs/client.zitadel.crt:/certs/client.zitadel.crt
+      # - ./certs/client.zitadel.key:/certs/client.zitadel.key
       - ./machinekey:/machinekey
     networks:
       - authnet
-      - db_cluster_dbnet
+      - dbnet
 
 networks:
   authnet:
-    driver: overlay
-    attachable: true
+    driver: bridge
 
-  dbnet1:
-    external: true
+  # dbnet1:
+  #   external: true

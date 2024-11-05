@@ -1,0 +1,19 @@
+services:
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.14.2
+    environment:
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - ELASTICSEARCH_USERNAME=kibana_system
+      - ELASTICSEARCH_PASSWORD=3E0IfAv32OjYAQO4Nevy
+      - xpack.security.enabled=false
+      - xpack.license.self_generated.type=basic
+      - SERVER_BASEPATH=/kibana
+      - SERVER_REWRITEBASEPATH=true
+    networks:
+      - rakeBackend
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.kibana.rule=Host(`${HOST}`) && PathPrefix(`/kibana`)"
+      - "traefik.http.services.kibana.loadbalancer.server.port=5601"
+      - "traefik.http.routers.kibana.tls.certresolver=letsencrypt"
