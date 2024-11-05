@@ -1,0 +1,7 @@
+networks:
+  dbnet1:
+    driver: bridge
+  dbnet2:
+    driver: bridge
+  dbnet3:
+    driver: bridge

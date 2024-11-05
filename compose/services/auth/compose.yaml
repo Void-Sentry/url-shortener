@@ -1,0 +1,32 @@
+services:
+  zitadel:
+    image: 'ghcr.io/zitadel/zitadel:latest'
+    command: 'start-from-init --config /config.yaml --masterkey "BivzmFKQeGFFEZnUiRrhUTDfYVPdwCea"'
+    env_file:
+      - .env
+    deploy:
+      replicas: 3
+      update_config:
+        parallelism: 2
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+    volumes:
+      - ./config.yaml:/config.yaml
+      - ./certs/ca.crt:/certs/ca.crt
+      - ./certs/client.root.crt:/certs/client.root.crt
+      - ./certs/client.root.key:/certs/client.root.key
+      - ./certs/client.zitadel.crt:/certs/client.zitadel.crt
+      - ./certs/client.zitadel.key:/certs/client.zitadel.key
+      - ./machinekey:/machinekey
+    networks:
+      - authnet
+      - db_cluster_dbnet
+
+networks:
+  authnet:
+    driver: overlay
+    attachable: true
+
+  dbnet1:
+    external: true

@@ -1,0 +1,4 @@
+volumes:
+  dbdata1:
+  dbdata2:
+  dbdata3:

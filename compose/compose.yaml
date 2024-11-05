@@ -1,0 +1,8 @@
+include:
+  - services/compose.yaml
+  - redirector/compose.yaml
+  - shortener/compose.yaml
+
+networks:
+  usnet:
+    driver: bridge

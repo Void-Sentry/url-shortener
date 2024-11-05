@@ -1,0 +1,82 @@
+include:
+  - net.yaml
+  - storage.yaml
+
+services:
+  roach-lb:
+    image: haproxy:latest
+    restart: always
+    container_name: roach-lb
+    ports:
+      - 26257:26257
+      - 8080:8080
+      - 8081:8081
+    depends_on:
+      - roach1
+      - roach2
+      - roach3
+    volumes:
+      - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
+    networks:
+      - dbnet1
+      - dbnet2
+      - dbnet3
+
+  roach1:
+    image: cockroachdb/cockroach:v24.2.1
+    networks:
+      - dbnet1
+      - dbnet2
+      - dbnet3
+    command: [
+      'start',
+      '--advertise-addr=roach1:26357',
+      '--http-addr=roach1:8080',
+      '--listen-addr=roach1:26357',
+      '--sql-addr=roach1:26257',
+      '--insecure',
+      '--join=roach1:26357,roach2:26357,roach3:26357',
+    ]
+    volumes:
+      - dbdata1:/cockroach/cockroach-data
+
+  roach2:
+    image: cockroachdb/cockroach:v24.2.1
+    depends_on:
+      - roach1
+    networks:
+      - dbnet1
+      - dbnet2
+      - dbnet3
+    command: [
+      'start',
+      '--advertise-addr=roach2:26357',
+      '--http-addr=roach2:8080',
+      '--listen-addr=roach2:26357',
+      '--sql-addr=roach2:26257',
+      '--insecure',
+      '--join=roach1:26357,roach2:26357,roach3:26357',
+    ]
+    volumes:
+      - dbdata2:/cockroach/cockroach-data
+
+  roach3:
+    image: cockroachdb/cockroach:v24.2.1
+    depends_on:
+      - roach1
+      - roach2
+    networks:
+      - dbnet1
+      - dbnet2
+      - dbnet3
+    command: [
+      'start',
+      '--advertise-addr=roach3:26357',
+      '--http-addr=roach3:8080',
+      '--listen-addr=roach3:26357',
+      '--sql-addr=roach3:26257',
+      '--insecure',
+      '--join=roach1:26357,roach2:26357,roach3:26357',
+    ]
+    volumes:
+      - dbdata3:/cockroach/cockroach-data

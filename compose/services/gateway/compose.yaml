@@ -1,0 +1,10 @@
+services:
+  gateway:
+    image: haproxy:latest
+    restart: always
+    ports:
+      - 80:80
+    volumes:
+      - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
+    networks:
+      - rake

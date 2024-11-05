@@ -1,0 +1,6 @@
+include:
+  - database/compose.yaml
+  - bus/compose.yaml
+  - cache/compose.yaml
+  - auth/compose.yaml
+  - gateway/compose.yaml

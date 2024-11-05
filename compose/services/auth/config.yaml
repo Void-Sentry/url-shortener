@@ -1,0 +1,26 @@
+Database:
+  cockroach:
+    Host: roach-lb
+    Port: 26257
+    Database: zitadel
+    MaxOpenConns: 20
+    MaxConnLifetime: 30m
+    MaxConnIdleTime: 30m
+    Options: ""
+    User:
+      Username: zitadel
+      Password: ""
+      SSL:
+        Mode: "verify-full"
+        RootCert: "/certs/ca.crt"
+        Cert: "/certs/client.zitadel.crt"
+        Key: "/certs/client.zitadel.key"
+    Admin:
+      Username: root
+      Password: ""
+      SSL:
+        Mode: "verify-full"
+        RootCert: "/certs/ca.crt"
+        Cert: "/certs/client.root.crt"
+        Key: "/certs/client.root.key"
+

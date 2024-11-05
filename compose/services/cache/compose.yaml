@@ -1,0 +1,15 @@
+include:
+  - net.yaml
+  - storage.yaml
+
+services:
+  cache:
+    image: 'docker.dragonflydb.io/dragonflydb/dragonfly'
+    ulimits:
+      memlock: -1
+    ports:
+      - "6379:6379"
+    networks:
+      - cachenet
+    volumes:
+      - cachedata:/data
