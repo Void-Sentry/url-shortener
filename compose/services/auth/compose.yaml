@@ -1,7 +1,7 @@
 services:
   zitadel:
     image: 'ghcr.io/zitadel/zitadel:latest'
-    command: 'start-from-init --config /config.yaml --masterkey "BivzmFKQeGFFEZnUiRrhUTDfYVPdwCea"'
+    command: 'start-from-init --config /config.yaml --masterkey "BivzmFKQeGFFEZnUiRrhUTDfYVPdwCea" --tlsMode disabled'
     secrets:
       - source: db_ca_crt
         target: ca.crt
@@ -15,10 +15,13 @@ services:
         mode: 0600
       - source: db_client_zitadel_crt
         target: client.zitadel.crt
-    env_file:
-      - .env
+    environment:
+      - ZITADEL_EXTERNALPORT=8001
+      - ZITADEL_EXTERNALSECURE=false
+      - ZITADEL_TLS_ENABLED=false
+      - ZITADEL_EXTERNALDOMAIN=localhost
     deploy:
-      replicas: 3
+      replicas: 1
       update_config:
         parallelism: 2
         delay: 10s

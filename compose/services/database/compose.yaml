@@ -7,10 +7,10 @@ services:
     image: haproxy:latest
     restart: always
     container_name: roach-lb
-    ports:
-      - 26257:26257
-      - 8080:8080
-      - 8081:8081
+    # ports:
+    #   - 26257:26257
+    #   - 8080:8080
+    #   - 8081:8081
     depends_on:
       - roach1
       - roach2

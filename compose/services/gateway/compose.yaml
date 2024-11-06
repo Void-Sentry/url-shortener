@@ -4,7 +4,11 @@ services:
     restart: always
     ports:
       - 80:80
+      - 8001:8001
+      - 5601:5601
     volumes:
       - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
     networks:
       - usnet
+      - elknet
+      - authnet

@@ -1,0 +1,9 @@
+include:
+  - elasticsearch.yaml
+  - logstash.yaml
+  - kibana.yaml
+  - filebeat.yaml
+
+networks:
+  elknet:
+    driver: bridge
