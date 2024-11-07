@@ -1,0 +1,129 @@
+Vagrant.configure("2") do |config|
+  config.vm.box = "generic/ubuntu2204"
+
+  config.vm.define "vm-gslb" do |machine|
+    machine.vm.provider "virtualbox" do |vb|
+      vb.memory = 4096
+      vb.cpus = 4
+    end
+
+    machine.vm.network "private_network", ip: "192.168.10.30"
+  end
+
+  (1..3).each do |i|
+    config.vm.define "vm-ceph#{i}" do |machine|
+      machine.vm.provider "virtualbox" do |vb|
+        vb.memory = 4096
+        vb.cpus = 4
+      end
+
+      machine.vm.network "private_network", ip: "192.168.10.#{80 + i}"
+
+      machine.vm.provision "shell", inline: <<-SHELL
+        apt-get update
+        apt-get install -y ceph-deploy
+
+        mkdir ceph-cluster
+        cd ceph-cluster
+        ceph-deploy new $HOST
+        ceph-deploy install $HOST
+        ceph-deploy mon create-initial
+        ceph-deploy osd create <hostname>:<device>
+
+        systemctl restart haproxy
+      SHELL
+    end
+  end
+
+  (1..2).each do |i|
+    config.vm.define "vm-lb#{i}" do |machine|
+      machine.vm.provider "virtualbox" do |vb|
+        vb.memory = 4096
+        vb.cpus = 4
+      end
+
+      machine.vm.network "private_network", ip: "192.168.10.#{20 + i}"
+
+      if i == 1
+        machine.vm.network "private_network", ip: "192.168.11.#{20 + i}"
+        machine.vm.provision "file", source: "./haproxy-lb1.cfg", destination: "/tmp/haproxy.cfg"
+      else
+        machine.vm.network "private_network", ip: "192.168.12.#{20 + i}"
+        machine.vm.provision "file", source: "./haproxy-lb2.cfg", destination: "/tmp/haproxy.cfg"
+      end
+
+      machine.vm.provision "shell", inline: <<-SHELL
+        apt-get update
+        apt-get install -y haproxy
+
+        mv /tmp/haproxy.cfg /etc/haproxy/haproxy.cfg
+
+        systemctl restart haproxy
+      SHELL
+    end
+  end
+
+  (1..6).each do |i|
+    config.vm.define "vm#{i}" do |machine|
+      machine.vm.hostname = "vm#{i}"
+      machine.vm.provider "virtualbox" do |vb|
+        vb.memory = 4096
+        vb.cpus = 4
+      end
+
+      machine.vm.network "private_network", ip: "192.168.10.#{10 + i}"
+
+      if i <= 3
+        machine.vm.network "private_network", ip: "192.168.11.#{10 + i}"
+      else
+        machine.vm.network "private_network", ip: "192.168.12.#{10 + i}"
+      end
+
+      # Provisionamento
+      machine.vm.provision "shell", inline: <<-SHELL
+        if [ #{i} -eq 1 ]; then
+          curl -sfL https://get.k3s.io | K3S_TOKEN=SECRET INSTALL_K3S_EXEC="--bind-address=192.168.11.11 --node-external-ip=192.168.11.11 --tls-san=192.168.10.21 --flannel-iface=eth2" sh -s -
+        elif [ #{i} -eq 2 ]; then
+          curl -sfL https://get.k3s.io | K3S_TOKEN=SECRET K3S_URL=https://192.168.11.11:6443 INSTALL_K3S_EXEC="--flannel-iface=eth2" sh -s -
+        elif [ #{i} -eq 3 ]; then
+          curl -sfL https://get.k3s.io | K3S_TOKEN=SECRET K3S_URL=https://192.168.11.11:6443 INSTALL_K3S_EXEC="--flannel-iface=eth2" sh -s -
+        elif [ #{i} -eq 4 ]; then
+          curl -sfL https://get.k3s.io | K3S_TOKEN=SECRET INSTALL_K3S_EXEC="--bind-address=192.168.12.14 --node-external-ip=192.168.12.14 --tls-san=192.168.10.22 --flannel-iface=eth2" sh -s -
+        elif [ #{i} -eq 5 ]; then
+          curl -sfL https://get.k3s.io | K3S_TOKEN=SECRET K3S_URL=https://192.168.12.14:6443 INSTALL_K3S_EXEC="--flannel-iface=eth2" sh -s -
+        elif [ #{i} -eq 6 ]; then
+          curl -sfL https://get.k3s.io | K3S_TOKEN=SECRET K3S_URL=https://192.168.12.14:6443 INSTALL_K3S_EXEC="--flannel-iface=eth2" sh -s -
+        fi
+
+        # Configuração do redirecionamento de tráfego
+        echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf
+        sysctl -p
+        
+        # Redirecionar tráfego da eth1 para a eth2
+        iptables -t nat -A PREROUTING -i eth1 -j DNAT --to-destination 192.168.10.#{10 + i}
+        iptables -A FORWARD -i eth1 -o eth2 -j ACCEPT
+        iptables -A FORWARD -i eth2 -o eth1 -m state --state ESTABLISHED,RELATED -j ACCEPT
+      SHELL
+    end
+  end
+
+  config.vm.define "vm-client" do |machine|
+    machine.vm.provider "virtualbox" do |vb|
+      vb.memory = 2048
+      vb.cpus = 2
+    end
+
+    machine.vm.network "private_network", ip: "192.168.10.35"
+
+    machine.vm.provision "shell", inline: <<-SHELL
+      curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+      curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256"
+      echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check
+      sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+      curl -Ls https://get.submariner.io | bash
+      export PATH=$PATH:~/.local/bin
+      echo export PATH=\$PATH:~/.local/bin >> ~/.profile
+    SHELL
+  end
+end
+  
