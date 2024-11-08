@@ -12,6 +12,14 @@ This project provides a URL shortening service using a microservices architectur
 
 Access the live demo of this setup at: [desktop-pq51n13.kiko-dorian.ts.net](https://desktop-pq51n13.kiko-dorian.ts.net)
 
+### Zitadel
+- mail: zitadel-admin@zitadel.desktop-pq51n13.kiko-dorian.ts.net
+- pass: Password1@
+
+### Kibana
+- user: elastic
+- pass: Re4=aPR5C5z-qb*9hGFr
+
 ## Setup Instructions
 
 ### 1. Clone the Repository
@@ -63,7 +71,11 @@ docker compose -f compose/compose.yaml up -d
 Run the following command to initialize the CockroachDB cluster:
 
 ```bash
-docker exec -it compose-roach1-1 cockroach init --host roach1 --certs-dir /run/secrets
+docker exec -it compose-roach1-1 ./cockroach --host roach1:26357 init --certs-dir /run/secrets
+```
+
+```bash
+docker restart compose-shortener-1
 ```
 
 ### 6. Set Up Elasticsearch and Kibana
@@ -111,7 +123,15 @@ Logstash will collect logs from your services and push them to Elasticsearch for
 Ensure the following configurations are set:
 
 ```bash
-docker compose -f compose/compose.yaml up -d logstash kibana filebeat --force-recreate
+docker compose -f compose/compose.yaml up -d logstash kibana --force-recreate
+```
+
+```bash
+docker compose -f compose/compose.yaml restart kibana filebeat
+```
+
+```bash
+docker compose -f compose/compose.yaml restart gateway
 ```
 
 This will start the Logstash, Kibana, and Filebeat services with the newly configured settings.
@@ -124,3 +144,20 @@ Log in using the kibana_system credentials, where the username is kibana_system 
 In Kibana, you can create visualizations, dashboards, and explore the logs coming from your URL Shortener services.
 
 Your URL shortening service is now set up and running!
+
+### 9. Login with ZITADEL
+Use https://oidcdebugger.com/debug as a client to obtain the token.
+
+OIDC Debugger Settings:
+
+- Authorize URI (required): https://localhost/oauth/v2/authorize
+- Client ID (required): 292930633691365378
+- Response Type (required): code
+- Use PKCE?: SHA-256
+- Token URI (required for PKCE): https://localhost/oauth/v2/token
+- Response Mode (required): form_post
+
+After submitting the form, go to the "PKCE result" section to copy the id_token. - Use this token as a Bearer Token in your requests.
+
+### 10. User Registration
+To enable user registration, you need to set up an SMTP server in the ZITADEL instance. This allows for sending verification and password recovery emails, which are essential for the user registration process.

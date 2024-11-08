@@ -1,0 +1,140 @@
+{
+	"info": {
+		"_postman_id": "ba0d686a-52d2-4377-9bcd-b95b378e35ae",
+		"name": "url shorten",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "31966927"
+	},
+	"item": [
+		{
+			"name": "list urls",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjI5MjkzMDU3Mjg0MDMzNzQxMCIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2Rlc2t0b3AtcHE1MW4xMy5raWtvLWRvcmlhbi50cy5uZXQiLCJzdWIiOiIyOTI5MzAwMzkzOTI1NjcyOTgiLCJhdWQiOlsiMjkyOTMwNjMzNjkxMzY1Mzc4IiwiMjkyOTMwNjAxMjc3NzE4NTMwIl0sImV4cCI6MTczMTEzOTU2NSwiaWF0IjoxNzMxMDk2MzY1LCJhdXRoX3RpbWUiOjE3MzEwOTYzNjQsIm5vbmNlIjoiaWxrdWQ2bnAycGsiLCJhbXIiOlsicHdkIl0sImF6cCI6IjI5MjkzMDYzMzY5MTM2NTM3OCIsImNsaWVudF9pZCI6IjI5MjkzMDYzMzY5MTM2NTM3OCIsImF0X2hhc2giOiJibUo5WnR6azV1T3Z0RmxJT3dtZjlnIiwic2lkIjoiVjFfMjkyOTMwODAyNzM4NTI4MjU4In0.COWVHgwmxaVRJDhIOBhSrp4i40aWTpZgpddahXDQqciGWr2CnbqbaawRdS-16CXRPSyvahZZLTBl-HQd1OtrLOWF274nM63Iyu6CELoCKI9Da9-D7XDNFs0BAbbmuWUfOQ7EqpCLbCQwFpo8iycM8z2l9utdbvP0XPeNva8BRRqjLksnNqYuC5LpkqG4ZkexXCLHzzg96S7IlmWQs9NlalS3IdCLMkz1-q_Ek7CNyseb4A7Zlf_rIatPNK-eQq-NFsWygBw10l5QOW0gaFPe2YIm9N_bkQaAOnQirJGiPhufBrqG3nL2SRHdGUiXhVISTfpLZVTpseQ5bmUrIbDkIw",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://desktop-pq51n13.kiko-dorian.ts.net/short",
+					"protocol": "https",
+					"host": [
+						"desktop-pq51n13",
+						"kiko-dorian",
+						"ts",
+						"net"
+					],
+					"path": [
+						"short"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "short url",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjI5MjkzMDU3Mjg0MDMzNzQxMCIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2Rlc2t0b3AtcHE1MW4xMy5raWtvLWRvcmlhbi50cy5uZXQiLCJzdWIiOiIyOTI5MzAwMzkzOTI1NjcyOTgiLCJhdWQiOlsiMjkyOTMwNjMzNjkxMzY1Mzc4IiwiMjkyOTMwNjAxMjc3NzE4NTMwIl0sImV4cCI6MTczMTEzOTU2NSwiaWF0IjoxNzMxMDk2MzY1LCJhdXRoX3RpbWUiOjE3MzEwOTYzNjQsIm5vbmNlIjoiaWxrdWQ2bnAycGsiLCJhbXIiOlsicHdkIl0sImF6cCI6IjI5MjkzMDYzMzY5MTM2NTM3OCIsImNsaWVudF9pZCI6IjI5MjkzMDYzMzY5MTM2NTM3OCIsImF0X2hhc2giOiJibUo5WnR6azV1T3Z0RmxJT3dtZjlnIiwic2lkIjoiVjFfMjkyOTMwODAyNzM4NTI4MjU4In0.COWVHgwmxaVRJDhIOBhSrp4i40aWTpZgpddahXDQqciGWr2CnbqbaawRdS-16CXRPSyvahZZLTBl-HQd1OtrLOWF274nM63Iyu6CELoCKI9Da9-D7XDNFs0BAbbmuWUfOQ7EqpCLbCQwFpo8iycM8z2l9utdbvP0XPeNva8BRRqjLksnNqYuC5LpkqG4ZkexXCLHzzg96S7IlmWQs9NlalS3IdCLMkz1-q_Ek7CNyseb4A7Zlf_rIatPNK-eQq-NFsWygBw10l5QOW0gaFPe2YIm9N_bkQaAOnQirJGiPhufBrqG3nL2SRHdGUiXhVISTfpLZVTpseQ5bmUrIbDkIw",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"originalUrl\": \"https://teddy360.com.br/material/marco-legal-das-garantias-sancionado-entenda-o-que-muda/\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://desktop-pq51n13.kiko-dorian.ts.net/short",
+					"protocol": "https",
+					"host": [
+						"desktop-pq51n13",
+						"kiko-dorian",
+						"ts",
+						"net"
+					],
+					"path": [
+						"short"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "redirect",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:80/sTEqVL",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "80",
+					"path": [
+						"sTEqVL"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "edit origin",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:80/short/1018806596919689217",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "80",
+					"path": [
+						"short",
+						"1018806596919689217"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete url",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:80/short/1018806596919689217",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "80",
+					"path": [
+						"short",
+						"1018806596919689217"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
