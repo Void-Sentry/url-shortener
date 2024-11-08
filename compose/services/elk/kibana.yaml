@@ -5,7 +5,7 @@ services:
       - ELASTICSEARCH_URL=http://elasticsearch:9200
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
       - ELASTICSEARCH_USERNAME=kibana_system
-      - ELASTICSEARCH_PASSWORD=Wf84tlDX=gr9jubxAZ3n
+      - ELASTICSEARCH_PASSWORD=TW6wtU4cBZG1jDa4uH+w
       - xpack.security.enabled=false
       - xpack.license.self_generated.type=basic
       - SERVER_BASEPATH=/kibana
