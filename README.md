@@ -145,7 +145,24 @@ In Kibana, you can create visualizations, dashboards, and explore the logs comin
 
 Your URL shortening service is now set up and running!
 
-### 9. Login with ZITADEL
+### 9. Setting Up a Zitadel Instance
+- navigate to http://localhost/ui/console
+
+#### 9.1 Initial Credentials
+- mail: zitadel-admin@zitadel.localhost
+- pass: Password1!
+
+#### 9.2 Set By Step
+- First Login: Log in to your Zitadel account for the first time.
+- Create a Project: Go to the dashboard and create a new project.
+- Add an Application: Within the project, create a new application.
+- Name: Give the application a meaningful name.
+- Type: Select the "Web" option for the application type.
+- Authentication Method: Choose "PKCE" (Proof Key for Code Exchange).
+- Set Redirect URI: Add https://oidcdebugger.com/debug as the Redirect URI.
+- Copy Client ID: Once configured, copy the Client ID for later use
+
+### 10. Login with ZITADEL
 Use https://oidcdebugger.com/debug as a client to obtain the token.
 
 OIDC Debugger Settings:
@@ -159,5 +176,5 @@ OIDC Debugger Settings:
 
 After submitting the form, go to the "PKCE result" section to copy the id_token. - Use this token as a Bearer Token in your requests.
 
-### 10. User Registration
+### 11. User Registration
 To enable user registration, you need to set up an SMTP server in the ZITADEL instance. This allows for sending verification and password recovery emails, which are essential for the user registration process.

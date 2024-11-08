@@ -6,7 +6,7 @@ services:
     environment:
       - xpack.monitoring.enabled=false
       - ELASTIC_USER = elastic
-      - ELASTIC_PASSWORD = =nyjA+aGLikjiuC1+mTC
+      - ELASTIC_PASSWORD = Re4=aPR5C5z-qb*9hGFr
       - ELASTIC_HOSTS = http://elasticsearch:9200
     # ports:
     #   - "5044:5044"
