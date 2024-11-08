@@ -1,0 +1,51 @@
+---
+# Source: cockroachdb/templates/job-cleaner.yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: cockroachdb-release-self-signer-cleaner
+  namespace: "auth"
+  annotations:
+    # This is what defines this resource as a hook. Without this line, the
+    # job is considered part of the release.
+    "helm.sh/hook": pre-delete
+    "helm.sh/hook-delete-policy": hook-succeeded,hook-failed
+  labels:
+    helm.sh/chart: cockroachdb-14.0.5
+    app.kubernetes.io/name: cockroachdb
+    app.kubernetes.io/instance: "cockroachdb-release"
+    app.kubernetes.io/managed-by: "Helm"
+spec:
+  backoffLimit: 1
+  template:
+    metadata:
+      name: cockroachdb-release-self-signer-cleaner
+      labels:
+        helm.sh/chart: cockroachdb-14.0.5
+        app.kubernetes.io/name: cockroachdb
+        app.kubernetes.io/instance: "cockroachdb-release"
+        app.kubernetes.io/managed-by: "Helm"
+    spec:
+      securityContext:
+        seccompProfile:
+          type: "RuntimeDefault"
+        runAsGroup: 1000
+        runAsUser: 1000
+        fsGroup: 1000
+        runAsNonRoot: true
+      restartPolicy: Never
+      containers:
+        - name: cleaner
+          image: "gcr.io/cockroachlabs-helm-charts/cockroach-self-signer-cert:1.5"
+          imagePullPolicy: "IfNotPresent"
+          args:
+            - cleanup
+            - --namespace=auth
+          env:
+          - name: STATEFULSET_NAME
+            value: cockroachdb-release
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+      serviceAccountName: cockroachdb-release-rotate-self-signer

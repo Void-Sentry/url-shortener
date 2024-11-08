@@ -1,0 +1,24 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - clusterrolebinding.yaml
+  - clusterrole.yaml
+  - cronjob-ca-certSelfSigner.yaml
+  - cronjob-client-node-certSelfSigner.yaml
+  - job-certSelfSigner.yaml
+  - job-cleaner.yaml
+  - job.init.yaml
+  - kustomization.yaml
+  - poddisruptionbudget.yaml
+  - rolebinding-certRotateSelfSigner.yaml
+  - rolebinding-certSelfSigner.yaml
+  - rolebinding.yaml
+  - role-certRotateSelfSigner.yaml
+  - role-certSelfSigner.yaml
+  - role.yaml
+  - serviceaccount-certRotateSelfSigner.yaml
+  - serviceaccount-certSelfSigner.yaml
+  - serviceaccount.yaml
+  - service.discovery.yaml
+  - service.public.yaml
+  - statefulset.yaml

@@ -1,0 +1,21 @@
+---
+# Source: kibana/templates/post-delete-rolebinding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: post-delete-kibana-release-kibana
+  labels: 
+    app: kibana
+    release: "kibana-release"
+    heritage: Helm
+  annotations:
+    "helm.sh/hook": post-delete
+    "helm.sh/hook-delete-policy": hook-succeeded
+subjects:
+  - kind: ServiceAccount
+    name: post-delete-kibana-release-kibana
+    namespace: "monitoring"
+roleRef:
+  kind: Role
+  name: post-delete-kibana-release-kibana
+  apiGroup: rbac.authorization.k8s.io

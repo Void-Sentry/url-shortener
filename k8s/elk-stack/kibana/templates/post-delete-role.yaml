@@ -1,0 +1,20 @@
+---
+# Source: kibana/templates/post-delete-role.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: post-delete-kibana-release-kibana
+  labels: 
+    app: kibana
+    release: "kibana-release"
+    heritage: Helm
+  annotations:
+    "helm.sh/hook": post-delete
+    "helm.sh/hook-delete-policy": hook-succeeded
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - secrets
+    verbs:
+      - delete

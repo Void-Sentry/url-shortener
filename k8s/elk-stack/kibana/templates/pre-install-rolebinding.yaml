@@ -1,0 +1,21 @@
+---
+# Source: kibana/templates/pre-install-rolebinding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: pre-install-kibana-release-kibana
+  labels: 
+    app: kibana
+    release: "kibana-release"
+    heritage: Helm
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-delete-policy": hook-succeeded
+subjects:
+  - kind: ServiceAccount
+    name: pre-install-kibana-release-kibana
+    namespace: "monitoring"
+roleRef:
+  kind: Role
+  name: pre-install-kibana-release-kibana
+  apiGroup: rbac.authorization.k8s.io

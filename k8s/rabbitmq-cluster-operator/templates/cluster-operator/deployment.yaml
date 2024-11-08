@@ -1,0 +1,121 @@
+---
+# Source: rabbitmq-cluster-operator/templates/cluster-operator/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rabbit-release-rabbitmq-cluster-operator
+  namespace: "bus"
+  labels:
+    app.kubernetes.io/instance: rabbit-release
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: rabbitmq-cluster-operator
+    app.kubernetes.io/version: 2.11.0
+    helm.sh/chart: rabbitmq-cluster-operator-4.3.26
+    app.kubernetes.io/component: rabbitmq-operator
+    app.kubernetes.io/part-of: rabbitmq
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  strategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: rabbit-release
+      app.kubernetes.io/name: rabbitmq-cluster-operator
+      app.kubernetes.io/component: rabbitmq-operator
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: rabbit-release
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: rabbitmq-cluster-operator
+        app.kubernetes.io/version: 2.11.0
+        helm.sh/chart: rabbitmq-cluster-operator-4.3.26
+        app.kubernetes.io/component: rabbitmq-operator
+        app.kubernetes.io/part-of: rabbitmq
+    spec:
+      serviceAccountName: rabbit-release-rabbitmq-cluster-operator
+      
+      automountServiceAccountToken: true
+      affinity:
+        podAffinity:
+          
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/instance: rabbit-release
+                    app.kubernetes.io/name: rabbitmq-cluster-operator
+                    app.kubernetes.io/component: rabbitmq-operator
+                topologyKey: kubernetes.io/hostname
+              weight: 1
+        nodeAffinity:
+          
+      securityContext:
+        fsGroup: 1001
+        fsGroupChangePolicy: Always
+        supplementalGroups: []
+        sysctls: []
+      initContainers:
+      containers:
+        - name: rabbitmq-cluster-operator
+          image: docker.io/bitnami/rabbitmq-cluster-operator:2.11.0-debian-12-r3
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            privileged: false
+            readOnlyRootFilesystem: true
+            runAsGroup: 1001
+            runAsNonRoot: true
+            runAsUser: 1001
+            seLinuxOptions: null
+            seccompProfile:
+              type: RuntimeDefault
+          command:
+            - /manager
+          args:
+            - --metrics-bind-address=:9782
+          env:
+            - name: OPERATOR_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: DEFAULT_RABBITMQ_IMAGE
+              value: docker.io/bitnami/rabbitmq:4.0.3-debian-12-r0
+            - name: DEFAULT_USER_UPDATER_IMAGE
+              value: docker.io/bitnami/rmq-default-credential-updater:1.0.4-debian-12-r30
+          envFrom:
+          resources:
+            limits:
+              cpu: 150m
+              ephemeral-storage: 2Gi
+              memory: 192Mi
+            requests:
+              cpu: 100m
+              ephemeral-storage: 50Mi
+              memory: 128Mi
+          livenessProbe:
+            failureThreshold: 5
+            initialDelaySeconds: 5
+            periodSeconds: 30
+            successThreshold: 1
+            timeoutSeconds: 5
+            tcpSocket:
+              port: http
+          readinessProbe:
+            failureThreshold: 5
+            initialDelaySeconds: 5
+            periodSeconds: 30
+            successThreshold: 1
+            timeoutSeconds: 5
+            httpGet:
+              path: /metrics
+              port: http
+          ports:
+            - name: http
+              containerPort: 9782
+              protocol: TCP

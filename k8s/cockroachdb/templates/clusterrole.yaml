@@ -1,0 +1,16 @@
+---
+# Source: cockroachdb/templates/clusterrole.yaml
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: cockroachdb-release-auth
+  namespace: "auth"
+  labels:
+    helm.sh/chart: cockroachdb-14.0.5
+    app.kubernetes.io/name: cockroachdb
+    app.kubernetes.io/instance: "cockroachdb-release"
+    app.kubernetes.io/managed-by: "Helm"
+rules:
+  - apiGroups: ["certificates.k8s.io"]
+    resources: ["certificatesigningrequests"]
+    verbs: ["create", "get", "watch"]

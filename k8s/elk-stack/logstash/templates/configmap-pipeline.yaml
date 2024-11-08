@@ -1,0 +1,27 @@
+---
+# Source: logstash/templates/configmap-pipeline.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: logstash-release-logstash-pipeline
+  labels:
+    app: "logstash-release-logstash"
+    chart: "logstash"
+    heritage: "Helm"
+    release: "logstash-release"
+data:
+  logstash.conf: |
+    input {
+      beats {
+        port => 5044
+      }
+    }
+    
+     output {
+      elasticsearch {
+        hosts => "https://elasticsearch-master:9200"
+        cacert => "/usr/share/logstash/config/elasticsearch-master-certs/ca.crt"
+        user => '${ELASTICSEARCH_USERNAME}'  # Elasticsearch username
+        password => '${ELASTICSEARCH_PASSWORD}' # Elasticsearch password
+      }
+    }

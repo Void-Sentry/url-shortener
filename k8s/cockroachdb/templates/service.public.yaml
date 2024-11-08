@@ -1,0 +1,34 @@
+---
+# Source: cockroachdb/templates/service.public.yaml
+# This Service is meant to be used by clients of the database.
+# It exposes a ClusterIP that will automatically load balance connections
+# to the different database Pods.
+kind: Service
+apiVersion: v1
+metadata:
+  name: cockroachdb-release-public
+  namespace: "auth"
+  labels:
+    helm.sh/chart: cockroachdb-14.0.5
+    app.kubernetes.io/name: cockroachdb
+    app.kubernetes.io/instance: "cockroachdb-release"
+    app.kubernetes.io/managed-by: "Helm"
+    app.kubernetes.io/component: cockroachdb
+  annotations:
+    service.alpha.kubernetes.io/app-protocols: '{"http":"HTTPS"}'
+spec:
+  type: "ClusterIP"
+  ports:
+    # The main port, served by gRPC, serves Postgres-flavor SQL, inter-node
+    # traffic and the CLI.
+    - name: "grpc"
+      port: 26257
+      targetPort: grpc
+    # The secondary port serves the UI as well as health and debug endpoints.
+    - name: "http"
+      port: 8080
+      targetPort: http
+  selector:
+    app.kubernetes.io/name: cockroachdb
+    app.kubernetes.io/instance: "cockroachdb-release"
+    app.kubernetes.io/component: cockroachdb

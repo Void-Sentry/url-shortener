@@ -1,0 +1,24 @@
+---
+# Source: cockroachdb/templates/role-certRotateSelfSigner.yaml
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: cockroachdb-release-rotate-self-signer
+  namespace: "auth"
+  labels:
+    helm.sh/chart: cockroachdb-14.0.5
+    app.kubernetes.io/name: cockroachdb
+    app.kubernetes.io/instance: "cockroachdb-release"
+    app.kubernetes.io/managed-by: "Helm"
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["create", "get", "update", "delete"]
+  - apiGroups: ["apps"]
+    resources: ["statefulsets"]
+    verbs: ["get"]
+    resourceNames:
+      - cockroachdb-release
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["delete", "get"]

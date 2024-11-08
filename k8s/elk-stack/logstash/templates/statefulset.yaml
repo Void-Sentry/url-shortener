@@ -1,0 +1,110 @@
+---
+# Source: logstash/templates/statefulset.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: logstash-release-logstash
+  labels:
+    app: "logstash-release-logstash"
+    chart: "logstash"
+    heritage: "Helm"
+    release: "logstash-release"
+spec:
+  serviceName: logstash-release-logstash-headless
+  selector:
+    matchLabels:
+      app: "logstash-release-logstash"
+      release: "logstash-release"
+  replicas: 1
+  podManagementPolicy: Parallel
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      name: "logstash-release-logstash"
+      labels:
+        app: "logstash-release-logstash"
+        chart: "logstash"
+        heritage: "Helm"
+        release: "logstash-release"
+      annotations:
+        pipelinechecksum: 479afa8a1178492cee6f238f8fd974b0f2d48fc7a35f76041d3fec2a5148f2b
+    spec:
+      securityContext:
+        fsGroup: 1000
+        runAsUser: 1000
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - "logstash-release-logstash"
+            topologyKey: kubernetes.io/hostname
+      terminationGracePeriodSeconds: 120
+      volumes:
+        - name: elasticsearch-master-certs
+          secret:
+            secretName: elasticsearch-master-certs
+        - name: logstashpipeline
+          configMap:
+            name: logstash-release-logstash-pipeline
+      containers:
+      - name: "logstash"
+        securityContext:
+          capabilities:
+            drop:
+            - ALL
+          runAsNonRoot: true
+          runAsUser: 1000
+        image: "docker.elastic.co/logstash/logstash:8.5.1"
+        imagePullPolicy: "IfNotPresent"
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /
+            port: http
+          initialDelaySeconds: 300
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 5
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /
+            port: http
+          initialDelaySeconds: 60
+          periodSeconds: 10
+          successThreshold: 3
+          timeoutSeconds: 5
+        ports:
+        - name: http
+          containerPort: 9600
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 1536Mi
+          requests:
+            cpu: 100m
+            memory: 1536Mi
+        env:
+          - name: LS_JAVA_OPTS
+            value: "-Xmx1g -Xms1g"
+          - name: ELASTICSEARCH_USERNAME
+            valueFrom:
+              secretKeyRef:
+                key: username
+                name: elasticsearch-master-credentials
+          - name: ELASTICSEARCH_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: password
+                name: elasticsearch-master-credentials
+        volumeMounts:
+          - name: elasticsearch-master-certs
+            mountPath: /usr/share/logstash/config/elasticsearch-master-certs
+          - name: logstashpipeline
+            mountPath: /usr/share/logstash/pipeline/logstash.conf
+            subPath: logstash.conf

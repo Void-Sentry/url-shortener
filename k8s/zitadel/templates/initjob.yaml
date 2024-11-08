@@ -1,0 +1,106 @@
+---
+# Source: zitadel/templates/initjob.yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "zitadel-release-init"
+  labels:
+    helm.sh/chart: zitadel-8.5.0
+    app.kubernetes.io/name: zitadel
+    app.kubernetes.io/instance: zitadel-release
+    app.kubernetes.io/version: "v2.61.0"
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: init
+  annotations:
+    helm.sh/hook: pre-install,pre-upgrade
+    helm.sh/hook-delete-policy: before-hook-creation
+    helm.sh/hook-weight: "1"
+spec:
+  backoffLimit: 5
+  activeDeadlineSeconds: 300
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: zitadel
+        app.kubernetes.io/instance: zitadel-release
+        app.kubernetes.io/component: init
+    spec:
+      serviceAccountName: zitadel-release
+      securityContext:
+        fsGroup: 1000
+        runAsNonRoot: true
+        runAsUser: 1000
+      enableServiceLinks: false
+      restartPolicy: OnFailure
+      containers:
+        - name: "zitadel-init"
+          securityContext:
+              privileged: false
+              readOnlyRootFilesystem: true
+              runAsNonRoot: true
+              runAsUser: 1000
+          image: "ghcr.io/zitadel/zitadel:v2.61.0"
+          imagePullPolicy: IfNotPresent
+          args:
+            - init
+            - --config
+            - /config/zitadel-config-yaml
+            - --config
+            - /zitadel-secrets-yaml/zitadel-secrets-yaml
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: status.podIP
+            - name: ZITADEL_DATABASE_COCKROACH_USER_SSL_ROOTCERT
+              value: /db-ssl-ca-crt/ca.crt
+            - name: ZITADEL_DATABASE_COCKROACH_ADMIN_SSL_ROOTCERT
+              value: /db-ssl-ca-crt/ca.crt
+            - name: ZITADEL_DATABASE_COCKROACH_ADMIN_SSL_CERT
+              value: /db-ssl-admin-crt/tls.crt
+            - name: ZITADEL_DATABASE_COCKROACH_ADMIN_SSL_KEY
+              value: /db-ssl-admin-crt/tls.key
+            - name: ZITADEL_DATABASE_COCKROACH_USER_SSL_CERT
+              value: /db-ssl-user-crt/tls.crt
+            - name: ZITADEL_DATABASE_COCKROACH_USER_SSL_KEY
+              value: /db-ssl-user-crt/tls.key
+          volumeMounts:
+          - name: zitadel-config-yaml
+            mountPath: /config
+            readOnly: true
+          - name: zitadel-secrets-yaml
+            mountPath: /zitadel-secrets-yaml
+            readOnly: true
+          - name: db-ssl-ca-crt
+            mountPath: /db-ssl-ca-crt
+            readOnly: true
+          - name: db-ssl-admin-crt
+            mountPath: /db-ssl-admin-crt
+            readOnly: true
+          - name: db-ssl-user-crt
+            mountPath: /db-ssl-user-crt
+            readOnly: true
+          resources:
+              {}
+      volumes:
+      - name: zitadel-config-yaml
+        configMap:
+          name: zitadel-config-yaml
+          defaultMode: 0440
+      - name: zitadel-secrets-yaml
+        secret:
+          secretName: zitadel-secrets-yaml
+          defaultMode: 0440
+      - name: db-ssl-ca-crt
+        secret:
+          secretName: db-cockroachdb-ca-secret
+          defaultMode: 0440
+      - name: db-ssl-admin-crt
+        secret:
+          secretName: db-cockroachdb-client-secret
+          defaultMode: 0440
+      - name: db-ssl-user-crt
+        secret:
+          secretName: db-cockroachdb-zitadel-secret
+          defaultMode: 0440

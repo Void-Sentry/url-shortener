@@ -1,0 +1,41 @@
+---
+# Source: cockroachdb/templates/cronjob-ca-certSelfSigner.yaml
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: cockroachdb-release-rotate-self-signer
+  namespace: "auth"
+  labels:
+    helm.sh/chart: cockroachdb-14.0.5
+    app.kubernetes.io/name: cockroachdb
+    app.kubernetes.io/instance: "cockroachdb-release"
+    app.kubernetes.io/managed-by: "Helm"
+spec:
+  schedule: 0 0 1 */11 *
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      template:
+        metadata:
+        spec:
+          restartPolicy: Never
+          containers:
+          - name: cert-rotate-job
+            image: "gcr.io/cockroachlabs-helm-charts/cockroach-self-signer-cert:1.5"
+            imagePullPolicy: "IfNotPresent"
+            args:
+            - rotate
+            - --ca
+            - --ca-duration=43800h
+            - --ca-expiry=648h
+            - --ca-cron=0 0 1 */11 *
+            - --readiness-wait=30s
+            - --pod-update-timeout=2m
+            env:
+            - name: STATEFULSET_NAME
+              value: cockroachdb-release
+            - name: NAMESPACE
+              value: auth
+            - name: CLUSTER_DOMAIN
+              value: cluster.local
+          serviceAccountName: cockroachdb-release-rotate-self-signer

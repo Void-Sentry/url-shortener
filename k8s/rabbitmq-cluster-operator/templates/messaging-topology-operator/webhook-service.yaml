@@ -1,0 +1,28 @@
+---
+# Source: rabbitmq-cluster-operator/templates/messaging-topology-operator/webhook-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/instance: rabbit-release
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: rabbitmq-cluster-operator
+    app.kubernetes.io/version: 1.15.0
+    helm.sh/chart: rabbitmq-cluster-operator-4.3.26
+    app.kubernetes.io/component: messaging-topology-operator
+    app.kubernetes.io/part-of: rabbitmq
+  name: rabbit-release-rabbitmq-messaging-topology-operator-webhook
+  namespace: "bus"
+spec:
+  type: ClusterIP
+  sessionAffinity: None
+  ports:
+    - name: https
+      port: 443
+      targetPort: https-webhook
+      protocol: TCP
+      nodePort: null
+  selector:
+    app.kubernetes.io/instance: rabbit-release
+    app.kubernetes.io/name: rabbitmq-cluster-operator
+    app.kubernetes.io/component: messaging-topology-operator

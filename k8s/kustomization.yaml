@@ -1,3 +1,8 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
+- cockroachdb/kustomization.yaml
+- rabbitmq-cluster-operator/kustomization.yaml
+- dragonfly-cluster-operator/kustomization.yaml
+- elk-stack/kustomization.yaml
+- zitadel/kustomization.yaml

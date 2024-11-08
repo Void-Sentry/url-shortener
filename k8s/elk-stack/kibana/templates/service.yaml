@@ -1,0 +1,20 @@
+---
+# Source: kibana/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: kibana-release-kibana
+  labels: 
+    app: kibana
+    release: "kibana-release"
+    heritage: Helm
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 5601
+      protocol: TCP
+      name: http
+      targetPort: 5601
+  selector:
+    app: kibana
+    release: "kibana-release"

@@ -1,0 +1,15 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - aggregate-cluster-roles.yaml
+  - clusterrolebinding.yaml
+  - clusterrole.yaml
+  - deployment.yaml
+  - kustomization.yaml
+  - networkpolicy.yaml
+  - pdb.yaml
+  - rolebinding.yaml
+  - role.yaml
+  - service-account.yaml
+  - validating-webhook-configuration.yaml
+  - webhook-service.yaml

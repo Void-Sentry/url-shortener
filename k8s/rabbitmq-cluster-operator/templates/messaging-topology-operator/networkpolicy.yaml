@@ -1,0 +1,31 @@
+---
+# Source: rabbitmq-cluster-operator/templates/messaging-topology-operator/networkpolicy.yaml
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: rabbit-release-rabbitmq-messaging-topology-operator
+  namespace: "bus"
+  labels:
+    app.kubernetes.io/instance: rabbit-release
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: rabbitmq-cluster-operator
+    app.kubernetes.io/version: 2.11.0
+    helm.sh/chart: rabbitmq-cluster-operator-4.3.26
+    app.kubernetes.io/component: messaging-topology-operator
+    app.kubernetes.io/part-of: rabbitmq
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/instance: rabbit-release
+      app.kubernetes.io/name: rabbitmq-cluster-operator
+      app.kubernetes.io/component: messaging-topology-operator
+      app.kubernetes.io/part-of: rabbitmq
+  policyTypes:
+    - Ingress
+    - Egress
+  egress:
+    - {}
+  ingress:
+    - ports:
+        
+        - port: 9443

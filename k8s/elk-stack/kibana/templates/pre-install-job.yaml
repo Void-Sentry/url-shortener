@@ -1,0 +1,54 @@
+---
+# Source: kibana/templates/pre-install-job.yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: pre-install-kibana-release-kibana
+  labels: 
+    app: kibana
+    release: "kibana-release"
+    heritage: Helm
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  backoffLimit: 20
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: create-kibana-token
+          image: "docker.elastic.co/kibana/kibana:8.5.1"
+          imagePullPolicy: "IfNotPresent"
+          command: ["/usr/share/kibana/node/bin/node"]
+          args:
+           - /usr/share/kibana/helm-scripts/manage-es-token.js
+           - create
+          env:
+            - name: "ELASTICSEARCH_USERNAME"
+              valueFrom:
+                secretKeyRef:
+                  name: elasticsearch-master-credentials
+                  key: username
+            - name: "ELASTICSEARCH_PASSWORD"
+              valueFrom:
+                secretKeyRef:
+                  name: elasticsearch-master-credentials
+                  key: password
+            - name: ELASTICSEARCH_SSL_CERTIFICATEAUTHORITIES
+              value: "/usr/share/kibana/config/certs/ca.crt"
+          volumeMounts:
+            - name: elasticsearch-certs
+              mountPath: /usr/share/kibana/config/certs
+              readOnly: true
+            - name: kibana-helm-scripts
+              mountPath: /usr/share/kibana/helm-scripts
+      serviceAccount: pre-install-kibana-release-kibana
+      volumes:
+        - name: elasticsearch-certs
+          secret:
+            secretName: elasticsearch-master-certs
+        - name: kibana-helm-scripts
+          configMap:
+            name: kibana-release-kibana-helm-scripts
+            defaultMode: 0755

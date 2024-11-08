@@ -1,0 +1,22 @@
+---
+# Source: rabbitmq-cluster-operator/templates/cluster-operator/pdb.yaml
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: rabbit-release-rabbitmq-cluster-operator
+  namespace: "bus"
+  labels:
+    app.kubernetes.io/instance: rabbit-release
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: rabbitmq-cluster-operator
+    app.kubernetes.io/version: 2.11.0
+    helm.sh/chart: rabbitmq-cluster-operator-4.3.26
+    app.kubernetes.io/component: rabbitmq-operator
+    app.kubernetes.io/part-of: rabbitmq
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: rabbit-release
+      app.kubernetes.io/name: rabbitmq-cluster-operator
+      app.kubernetes.io/component: rabbitmq-operator

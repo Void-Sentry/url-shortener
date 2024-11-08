@@ -1,0 +1,85 @@
+---
+# Source: rabbitmq-cluster-operator/templates/cluster-operator/aggregate-cluster-roles.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: rabbit-release-rabbitmq-cluster-operator-bus-admin
+  labels:
+    app.kubernetes.io/instance: rabbit-release
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: rabbitmq-cluster-operator
+    app.kubernetes.io/version: 2.11.0
+    helm.sh/chart: rabbitmq-cluster-operator-4.3.26
+    app.kubernetes.io/component: rabbitmq-operator
+    app.kubernetes.io/part-of: rabbitmq
+    rbac.authorization.k8s.io/aggregate-to-admin: "true"
+rules:
+  - apiGroups:
+      - rabbitmq.com
+    resources:
+      - rabbitmqclusters
+      - rabbitmqclusters/finalizers
+    verbs: 
+      - create
+      - delete
+      - deletecollection
+      - get
+      - list
+      - patch
+      - update
+      - watch
+---
+# Source: rabbitmq-cluster-operator/templates/cluster-operator/aggregate-cluster-roles.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: rabbit-release-rabbitmq-cluster-operator-bus-edit
+  labels:
+    app.kubernetes.io/instance: rabbit-release
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: rabbitmq-cluster-operator
+    app.kubernetes.io/version: 2.11.0
+    helm.sh/chart: rabbitmq-cluster-operator-4.3.26
+    app.kubernetes.io/component: rabbitmq-operator
+    app.kubernetes.io/part-of: rabbitmq
+    rbac.authorization.k8s.io/aggregate-to-edit: "true"
+rules:
+  - apiGroups:
+      - rabbitmq.com
+    resources:
+      - rabbitmqclusters
+      - rabbitmqclusters/finalizers
+    verbs: 
+      - create
+      - delete
+      - deletecollection
+      - get
+      - list
+      - patch
+      - update
+      - watch
+---
+# Source: rabbitmq-cluster-operator/templates/cluster-operator/aggregate-cluster-roles.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: rabbit-release-rabbitmq-cluster-operator-bus-view
+  labels:
+    app.kubernetes.io/instance: rabbit-release
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: rabbitmq-cluster-operator
+    app.kubernetes.io/version: 2.11.0
+    helm.sh/chart: rabbitmq-cluster-operator-4.3.26
+    app.kubernetes.io/component: rabbitmq-operator
+    app.kubernetes.io/part-of: rabbitmq
+    rbac.authorization.k8s.io/aggregate-to-view: "true"
+rules:
+  - apiGroups:
+      - rabbitmq.com
+    resources:
+      - rabbitmqclusters
+      - rabbitmqclusters/finalizers
+    verbs: 
+      - get
+      - list
+      - watch
