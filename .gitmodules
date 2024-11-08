@@ -1,6 +1,6 @@
 [submodule "shortener"]
 	path = shortener
-	url = git@github.com:Void-Sentry/shortener.git
+	url = https://github.com/Void-Sentry/shortener.git
 [submodule "redirector"]
 	path = redirector
-	url = git@github.com:Void-Sentry/redirector.git
+	url = https://github.com/Void-Sentry/redirector.git
