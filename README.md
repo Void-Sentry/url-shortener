@@ -119,7 +119,7 @@ This will start the Logstash, Kibana, and Filebeat services with the newly confi
 ### 8. Access Kibana Dashboard
 Once everything is up and running, you can access the Kibana dashboard to visualize and analyze the logs.
 
-Open your browser and navigate to http://localhost:5601 to access Kibana.
+Open your browser and navigate to http://localhost/kibana to access Kibana.
 Log in using the kibana_system credentials, where the username is kibana_system and the password is the one you reset earlier.
 In Kibana, you can create visualizations, dashboards, and explore the logs coming from your URL Shortener services.
 
