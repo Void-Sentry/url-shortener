@@ -1,0 +1,136 @@
+---
+# Source: zitadel/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zitadel
+  labels:
+    helm.sh/chart: zitadel-8.13.1
+    app.kubernetes.io/name: zitadel
+    app.kubernetes.io/instance: zitadel
+    app.kubernetes.io/version: "v2.67.2"
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: start
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: zitadel
+      app.kubernetes.io/instance: zitadel
+  template:
+    metadata:
+      annotations:
+        checksum/configmap: b4c027501e99f5b61e3242282e322aa16afb91cf4e69818da55e330b759ba66e
+        checksum/secret-db-ssl-ca-crt: 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b
+        checksum/secret-zitadel-secrets: 59e151c58d7aafac211bf463e9c5e323cf43c234c25f828343a7a20cad2a4109
+      labels:
+        app.kubernetes.io/component: start
+        app.kubernetes.io/name: zitadel
+        app.kubernetes.io/instance: zitadel
+    spec:
+      serviceAccountName: zitadel
+      securityContext:
+        fsGroup: 1000
+        runAsNonRoot: true
+        runAsUser: 1000
+      enableServiceLinks: false
+      containers:
+        - name: zitadel
+          securityContext:
+              privileged: false
+              readOnlyRootFilesystem: true
+              runAsNonRoot: true
+              runAsUser: 1000
+          image: "ghcr.io/zitadel/zitadel:v2.67.2"
+          imagePullPolicy: IfNotPresent
+          args:
+            - start
+            - --config
+            - /config/zitadel-config-yaml
+            - --config
+            - /zitadel-secrets-yaml/zitadel-secrets-yaml
+            - --masterkeyFromEnv
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: status.podIP
+            - name: ZITADEL_MASTERKEY
+              valueFrom:
+                secretKeyRef:
+                  name: zitadel-masterkey
+                  key: masterkey
+            - name: ZITADEL_DATABASE_COCKROACH_USER_SSL_ROOTCERT
+              value: /db-ssl-ca-crt/ca.crt
+            - name: ZITADEL_DATABASE_COCKROACH_USER_SSL_CERT
+              value: /db-ssl-user-crt/tls.crt
+            - name: ZITADEL_DATABASE_COCKROACH_USER_SSL_KEY
+              value: /db-ssl-user-crt/tls.key
+          ports:
+          - containerPort: 8080
+            name: http2-server
+            protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /debug/healthz
+              port: http2-server
+              httpHeaders:
+                - name: Host
+                  value: 127.0.0.1.sslip.io
+              scheme: HTTP
+            initialDelaySeconds: 0
+            periodSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /debug/ready
+              port: http2-server
+              httpHeaders:
+                - name: Host
+                  value: 127.0.0.1.sslip.io
+              scheme: HTTP
+            initialDelaySeconds: 0
+            periodSeconds: 5
+            failureThreshold: 3
+          startupProbe:
+            httpGet:
+              path: /debug/ready
+              port: http2-server
+              httpHeaders:
+                - name: Host
+                  value: 127.0.0.1.sslip.io
+              scheme: HTTP
+            periodSeconds: 1
+            failureThreshold: 30
+          volumeMounts:
+          - name: zitadel-config-yaml
+            mountPath: /config
+            readOnly: true
+          - name: zitadel-secrets-yaml
+            mountPath: /zitadel-secrets-yaml
+            readOnly: true
+          - name: db-ssl-ca-crt
+            mountPath: /db-ssl-ca-crt
+            readOnly: true
+          - name: db-ssl-user-crt
+            mountPath: /db-ssl-user-crt
+            readOnly: true
+          resources:
+              {}
+      volumes:
+      - name: zitadel-config-yaml
+        configMap:
+          name: zitadel-config-yaml
+      - name: zitadel-secrets-yaml
+        secret:
+          secretName: zitadel-secrets-yaml
+          defaultMode: 0440
+      - name: db-ssl-ca-crt
+        secret:
+          secretName: db-cockroachdb-ca-secret
+          defaultMode: 0440
+      - name: db-ssl-user-crt
+        secret:
+          secretName: db-cockroachdb-zitadel-secret
+          defaultMode: 0440

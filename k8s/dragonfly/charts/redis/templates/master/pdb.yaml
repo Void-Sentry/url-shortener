@@ -1,0 +1,21 @@
+---
+# Source: dragonfly/charts/redis/templates/master/pdb.yaml
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: dragonfly-redis-master
+  namespace: "dragonfly-system"
+  labels:
+    app.kubernetes.io/instance: dragonfly
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: redis
+    app.kubernetes.io/version: 7.2.5
+    helm.sh/chart: redis-19.5.5
+    app.kubernetes.io/component: master
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: dragonfly
+      app.kubernetes.io/name: redis
+      app.kubernetes.io/component: master

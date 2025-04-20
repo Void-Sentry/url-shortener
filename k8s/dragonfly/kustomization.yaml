@@ -1,0 +1,37 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - charts/mysql/templates/networkpolicy.yaml
+  - charts/mysql/templates/primary/configmap.yaml
+  - charts/mysql/templates/primary/statefulset.yaml
+  - charts/mysql/templates/primary/svc-headless.yaml
+  - charts/mysql/templates/primary/svc.yaml
+  - charts/mysql/templates/secrets.yaml
+  - charts/mysql/templates/serviceaccount.yaml
+  - charts/redis/templates/configmap.yaml
+  - charts/redis/templates/headless-svc.yaml
+  - charts/redis/templates/health-configmap.yaml
+  - charts/redis/templates/master/application.yaml
+  - charts/redis/templates/master/pdb.yaml
+  - charts/redis/templates/master/serviceaccount.yaml
+  - charts/redis/templates/master/service.yaml
+  - charts/redis/templates/networkpolicy.yaml
+  - charts/redis/templates/replicas/application.yaml
+  - charts/redis/templates/replicas/pdb.yaml
+  - charts/redis/templates/replicas/serviceaccount.yaml
+  - charts/redis/templates/replicas/service.yaml
+  - charts/redis/templates/scripts-configmap.yaml
+  - charts/redis/templates/secret.yaml
+  - templates/client/client-configmap.yaml
+  - templates/client/client-daemonset.yaml
+  - templates/manager/manager-configmap.yaml
+  - templates/manager/manager-deployment.yaml
+  - templates/manager/manager-svc.yaml
+  - templates/manager/metrics-svc.yaml
+  - templates/scheduler/metrics-svc.yaml
+  - templates/scheduler/scheduler-configmap.yaml
+  - templates/scheduler/scheduler-statefulset.yaml
+  - templates/scheduler/scheduler-svc.yaml
+  - templates/seed-client/seed-client-configmap.yaml
+  - templates/seed-client/seed-client-statefulset.yaml
+  - templates/seed-client/seed-client-svc.yaml

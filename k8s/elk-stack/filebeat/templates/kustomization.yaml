@@ -6,7 +6,6 @@ resources:
   - configmap.yaml
   - daemonset.yaml
   - deployment.yaml
-  - kustomization.yaml
   - rolebinding.yaml
   - role.yaml
   - serviceaccount.yaml

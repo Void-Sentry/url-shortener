@@ -1,0 +1,77 @@
+---
+# Source: dragonfly/templates/seed-client/seed-client-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dragonfly-seed-client
+  namespace: "dragonfly-system"
+  labels:
+    app: dragonfly
+    chart: dragonfly-1.3.19
+    release: dragonfly
+    heritage: Helm
+    component: seed-client
+data:
+  dfdaemon.yaml: |-
+    host:
+      idc: ""
+      location: ""
+    server:
+      cacheDir: /var/cache/dragonfly/dfdaemon/
+      pluginDir: /var/lib/dragonfly/plugins/dfdaemon/
+    download:
+      concurrentPieceCount: 16
+      pieceTimeout: 30s
+      rateLimit: 50GiB
+      server:
+        requestRateLimit: 4000
+        socketPath: /var/run/dragonfly/dfdaemon.sock
+    upload:
+      rateLimit: 50GiB
+      server:
+        port: 4000
+        requestRateLimit: 4000
+    manager:
+      addr: http://dragonfly-manager.dragonfly-system.svc.cluster.local:65003
+    scheduler:
+      announceInterval: 1m
+      maxScheduleCount: 5
+      scheduleTimeout: 30s
+    seedPeer:
+      clusterID: 1
+      enable: true
+      keepaliveInterval: 15s
+      type: super
+    dynconfig:
+      refreshInterval: 1m
+    storage:
+      dir: /var/lib/dragonfly/
+      keep: true
+      readBufferSize: 4194304
+      writeBufferSize: 4194304
+    gc:
+      interval: 900s
+      policy:
+        distHighThresholdPercent: 80
+        distLowThresholdPercent: 60
+        taskTTL: 168h
+    proxy:
+      disableBackToSource: false
+      prefetch: true
+      prefetchRateLimit: 5GiB
+      readBufferSize: 4194304
+      registryMirror:
+        addr: https://index.docker.io
+      rules:
+      - regex: blobs/sha256.*
+      server:
+        port: 4001
+    health:
+      server:
+        port: 4003
+    metrics:
+      server:
+        port: 4002
+    stats:
+      server:
+        port: 4004

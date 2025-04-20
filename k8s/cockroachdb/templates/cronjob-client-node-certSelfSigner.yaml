@@ -3,12 +3,12 @@
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
-  name: cockroachdb-release-rotate-self-signer-client
-  namespace: "auth"
+  name: cockroachdb-rotate-self-signer-client
+  namespace: "cockroachdb-system"
   labels:
-    helm.sh/chart: cockroachdb-14.0.5
+    helm.sh/chart: cockroachdb-16.0.6
     app.kubernetes.io/name: cockroachdb
-    app.kubernetes.io/instance: "cockroachdb-release"
+    app.kubernetes.io/instance: "cockroachdb"
     app.kubernetes.io/managed-by: "Helm"
 spec:
   schedule: 0 0 */26 * *
@@ -21,7 +21,7 @@ spec:
           restartPolicy: Never
           containers:
           - name: cert-rotate-job
-            image: "gcr.io/cockroachlabs-helm-charts/cockroach-self-signer-cert:1.5"
+            image: "gcr.io/cockroachlabs-helm-charts/cockroach-self-signer-cert:1.7"
             imagePullPolicy: "IfNotPresent"
             args:
             - rotate
@@ -38,9 +38,9 @@ spec:
             - --pod-update-timeout=2m
             env:
             - name: STATEFULSET_NAME
-              value: cockroachdb-release
+              value: cockroachdb
             - name: NAMESPACE
-              value: auth
+              value: cockroachdb-system
             - name: CLUSTER_DOMAIN
               value: cluster.local
-          serviceAccountName: cockroachdb-release-rotate-self-signer
+          serviceAccountName: cockroachdb-rotate-self-signer

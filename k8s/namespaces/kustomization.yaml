@@ -1,0 +1,10 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - auth.yaml
+  - bus.yaml
+  - cache.yaml
+  - cockroachdb-system.yaml
+  - database.yaml
+  - dragonfly-system.yaml
+  - rabbitmq-system.yaml

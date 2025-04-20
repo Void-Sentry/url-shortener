@@ -3,7 +3,6 @@ kind: Kustomization
 resources:
   - configmap-helm-scripts.yaml
   - deployment.yaml
-  - kustomization.yaml
   - post-delete-job.yaml
   - post-delete-rolebinding.yaml
   - post-delete-role.yaml

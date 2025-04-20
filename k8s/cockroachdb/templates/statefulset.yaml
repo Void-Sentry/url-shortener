@@ -3,16 +3,16 @@
 kind: StatefulSet
 apiVersion: apps/v1
 metadata:
-  name: cockroachdb-release
-  namespace: "auth"
+  name: cockroachdb
+  namespace: "cockroachdb-system"
   labels:
-    helm.sh/chart: cockroachdb-14.0.5
+    helm.sh/chart: cockroachdb-16.0.6
     app.kubernetes.io/name: cockroachdb
-    app.kubernetes.io/instance: "cockroachdb-release"
+    app.kubernetes.io/instance: "cockroachdb"
     app.kubernetes.io/managed-by: "Helm"
     app.kubernetes.io/component: cockroachdb
 spec:
-  serviceName: cockroachdb-release
+  serviceName: cockroachdb
   replicas: 3
   updateStrategy:
     type: RollingUpdate
@@ -20,16 +20,16 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/name: cockroachdb
-      app.kubernetes.io/instance: "cockroachdb-release"
+      app.kubernetes.io/instance: "cockroachdb"
       app.kubernetes.io/component: cockroachdb
   template:
     metadata:
       labels:
         app.kubernetes.io/name: cockroachdb
-        app.kubernetes.io/instance: "cockroachdb-release"
+        app.kubernetes.io/instance: "cockroachdb"
         app.kubernetes.io/component: cockroachdb
     spec:
-      serviceAccountName: cockroachdb-release
+      serviceAccountName: cockroachdb
       initContainers:
         - name: copy-certs
           image: "busybox"
@@ -64,13 +64,13 @@ spec:
                 labelSelector:
                   matchLabels:
                     app.kubernetes.io/name: cockroachdb
-                    app.kubernetes.io/instance: "cockroachdb-release"
+                    app.kubernetes.io/instance: "cockroachdb"
                     app.kubernetes.io/component: cockroachdb
       topologySpreadConstraints:
       - labelSelector:
           matchLabels:
             app.kubernetes.io/name: cockroachdb
-            app.kubernetes.io/instance: "cockroachdb-release"
+            app.kubernetes.io/instance: "cockroachdb"
             app.kubernetes.io/component: cockroachdb
         maxSkew: 1
         topologyKey: topology.kubernetes.io/zone
@@ -80,7 +80,7 @@ spec:
       terminationGracePeriodSeconds: 300
       containers:
         - name: db
-          image: "cockroachdb/cockroach:v24.2.4"
+          image: "cockroachdb/cockroach:v25.1.4"
           imagePullPolicy: "IfNotPresent"
           args:
             - shell
@@ -107,21 +107,21 @@ spec:
               --advertise-host=$(hostname).${STATEFULSET_FQDN}
               --certs-dir=/cockroach/cockroach-certs/
               --http-port=8080
-            
               --port=26257
-              --cache=2Gi
-              --max-sql-memory=2Gi
+              --cache=25%
+              --max-sql-memory=25%
               --logtostderr=INFO
           env:
             - name: STATEFULSET_NAME
-              value: cockroachdb-release
+              value: cockroachdb
             - name: STATEFULSET_FQDN
-              value: cockroachdb-release.auth.svc.cluster.local
+              value: cockroachdb.cockroachdb-system.svc.cluster.local
             - name: COCKROACH_CHANNEL
               value: kubernetes-helm
+            - name: GODEBUG
+              value: disablethp=1
           ports:
             - name: grpc
-              
               containerPort: 26257
               protocol: TCP
             - name: http
@@ -132,7 +132,6 @@ spec:
               mountPath: /cockroach/cockroach-data/
             - name: certs
               mountPath: /cockroach/cockroach-certs/
-          
           livenessProbe:
             httpGet:
               path: /health
@@ -159,14 +158,13 @@ spec:
         - name: datadir
           persistentVolumeClaim:
             claimName: datadir
-        
         - name: certs
           emptyDir: {}
         - name: certs-secret
           projected:
             sources:
             - secret:
-                name: cockroachdb-release-node-secret
+                name: cockroachdb-node-secret
                 items:
                 - key: ca.crt
                   path: ca.crt
@@ -189,7 +187,7 @@ spec:
         name: datadir
         labels:
           app.kubernetes.io/name: cockroachdb
-          app.kubernetes.io/instance: "cockroachdb-release"
+          app.kubernetes.io/instance: "cockroachdb"
       spec:
         accessModes: ["ReadWriteOnce"]
         resources:

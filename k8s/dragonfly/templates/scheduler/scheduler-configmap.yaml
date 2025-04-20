@@ -1,0 +1,71 @@
+---
+# Source: dragonfly/templates/scheduler/scheduler-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dragonfly-scheduler
+  namespace: "dragonfly-system"
+  labels:
+    app: dragonfly
+    chart: dragonfly-1.3.19
+    release: dragonfly
+    heritage: Helm
+    component: scheduler
+data:
+  scheduler.yaml: |-
+    server:
+      advertiseIP: ""
+      advertisePort: 8002
+      cacheDir: ""
+      dataDir: ""
+      listenIP: 0.0.0.0
+      logDir: ""
+      pluginDir: ""
+      port: 8002
+      workHome: ""
+    scheduler:
+      algorithm: default
+      backToSourceCount: 200
+      gc:
+        hostGCInterval: 5m
+        hostTTL: 1h
+        peerGCInterval: 10s
+        peerTTL: 48h
+        pieceDownloadTimeout: 30m
+        taskGCInterval: 30m
+      retryBackToSourceLimit: 3
+      retryInterval: 50ms
+      retryLimit: 5
+    database:
+      redis:
+        addrs:
+        - dragonfly-redis-master.dragonfly-system.svc.cluster.local:6379
+        password: dragonfly
+    dynconfig:
+      refreshInterval: 1m
+      type: manager
+    host:
+      idc: ""
+      location: ""
+    manager:
+      addr: dragonfly-manager.dragonfly-system.svc.cluster.local:65003
+      schedulerClusterID: 1
+      keepAlive:
+        interval: 5s
+    seedPeer:
+      enable: true
+    job:
+      redis:
+        addrs:
+        - dragonfly-redis-master.dragonfly-system.svc.cluster.local:6379
+        password: dragonfly
+    storage:
+      null
+    network:
+      enableIPv6: false
+    metrics:
+      enable: true
+      addr: ":8000"
+      enableHost: false
+    console: true
+    verbose: false

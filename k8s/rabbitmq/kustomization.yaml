@@ -1,0 +1,13 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - templates/config-secret.yaml
+  - templates/networkpolicy.yaml
+  - templates/pdb.yaml
+  - templates/rolebinding.yaml
+  - templates/role.yaml
+  - templates/secrets.yaml
+  - templates/serviceaccount.yaml
+  - templates/statefulset.yaml
+  - templates/svc-headless.yaml
+  - templates/svc.yaml

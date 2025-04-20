@@ -1,0 +1,19 @@
+---
+# Source: rabbitmq/templates/pdb.yaml
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: rabbitmq
+  namespace: "rabbitmq-system"
+  labels:
+    app.kubernetes.io/instance: rabbitmq
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: rabbitmq
+    app.kubernetes.io/version: 4.0.9
+    helm.sh/chart: rabbitmq-15.5.3
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: rabbitmq
+      app.kubernetes.io/name: rabbitmq

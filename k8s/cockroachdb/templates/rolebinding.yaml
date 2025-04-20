@@ -1,20 +1,40 @@
 ---
 # Source: cockroachdb/templates/rolebinding.yaml
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: cockroachdb-cockroachdb-system-node-reader
+  namespace: "cockroachdb-system"
+  labels:
+    helm.sh/chart: cockroachdb-16.0.6
+    app.kubernetes.io/name: cockroachdb
+    app.kubernetes.io/instance: "cockroachdb"
+    app.kubernetes.io/managed-by: "Helm"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cockroachdb-cockroachdb-system-node-reader
+subjects:
+  - kind: ServiceAccount
+    name: cockroachdb
+    namespace: "cockroachdb-system"
+---
+# Source: cockroachdb/templates/rolebinding.yaml
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: cockroachdb-release
-  namespace: "auth"
+  name: cockroachdb
+  namespace: "cockroachdb-system"
   labels:
-    helm.sh/chart: cockroachdb-14.0.5
+    helm.sh/chart: cockroachdb-16.0.6
     app.kubernetes.io/name: cockroachdb
-    app.kubernetes.io/instance: "cockroachdb-release"
+    app.kubernetes.io/instance: "cockroachdb"
     app.kubernetes.io/managed-by: "Helm"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: cockroachdb-release
+  name: cockroachdb
 subjects:
   - kind: ServiceAccount
-    name: cockroachdb-release
-    namespace: "auth"
+    name: cockroachdb
+    namespace: "cockroachdb-system"

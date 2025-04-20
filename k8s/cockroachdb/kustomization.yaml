@@ -1,4 +1,24 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-- templates/kustomization.yaml
+  - templates/clusterrolebinding.yaml
+  - templates/clusterrole.yaml
+  - templates/cronjob-ca-certSelfSigner.yaml
+  - templates/cronjob-client-node-certSelfSigner.yaml
+  - templates/job-certSelfSigner.yaml
+  - templates/job-cleaner.yaml
+  - templates/job.init.yaml
+  - templates/poddisruptionbudget.yaml
+  - templates/rolebinding-certRotateSelfSigner.yaml
+  - templates/rolebinding-certSelfSigner.yaml
+  - templates/rolebinding.yaml
+  - templates/role-certRotateSelfSigner.yaml
+  - templates/role-certSelfSigner.yaml
+  - templates/role.yaml
+  - templates/serviceaccount-certRotateSelfSigner.yaml
+  - templates/serviceaccount-certSelfSigner.yaml
+  - templates/serviceaccount.yaml
+  - templates/service.discovery.yaml
+  - templates/service.public.yaml
+  - templates/statefulset.yaml
+  - templates/tests/client.yaml

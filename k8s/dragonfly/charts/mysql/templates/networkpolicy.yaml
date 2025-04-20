@@ -1,0 +1,30 @@
+---
+# Source: dragonfly/charts/mysql/templates/networkpolicy.yaml
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: dragonfly-mysql
+  namespace: "dragonfly-system"
+  labels:
+    app.kubernetes.io/instance: dragonfly
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: mysql
+    app.kubernetes.io/version: 8.0.36
+    helm.sh/chart: mysql-10.1.1
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/instance: dragonfly
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: mysql
+      app.kubernetes.io/version: 8.0.36
+      helm.sh/chart: mysql-10.1.1
+  policyTypes:
+    - Ingress
+    - Egress
+  egress:
+    - {}
+  ingress:
+    - ports:
+        - port: 3306
+        - port: 3306

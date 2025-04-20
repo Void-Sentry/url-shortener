@@ -3,12 +3,12 @@
 kind: Job
 apiVersion: batch/v1
 metadata:
-  name: cockroachdb-release-init
-  namespace: "auth"
+  name: cockroachdb-init
+  namespace: "cockroachdb-system"
   labels:
-    helm.sh/chart: cockroachdb-14.0.5
+    helm.sh/chart: cockroachdb-16.0.6
     app.kubernetes.io/name: cockroachdb
-    app.kubernetes.io/instance: "cockroachdb-release"
+    app.kubernetes.io/instance: "cockroachdb"
     app.kubernetes.io/managed-by: "Helm"
     app.kubernetes.io/component: init
   annotations:
@@ -19,7 +19,7 @@ spec:
     metadata:
       labels:
         app.kubernetes.io/name: cockroachdb
-        app.kubernetes.io/instance: "cockroachdb-release"
+        app.kubernetes.io/instance: "cockroachdb"
         app.kubernetes.io/component: init
     spec:
       securityContext:
@@ -31,7 +31,7 @@ spec:
         runAsNonRoot: true
       restartPolicy: OnFailure
       terminationGracePeriodSeconds: 300
-      serviceAccountName: cockroachdb-release
+      serviceAccountName: cockroachdb
       initContainers:
         - name: copy-certs
           image: "busybox"
@@ -56,7 +56,7 @@ spec:
               mountPath: /certs/
       containers:
         - name: cluster-init
-          image: "cockroachdb/cockroach:v24.2.4"
+          image: "cockroachdb/cockroach:v25.1.4"
           imagePullPolicy: "IfNotPresent"
           # Run the command in an `while true` loop because this Job is bound
           # to come up before the CockroachDB Pods (due to the time needed to
@@ -77,7 +77,7 @@ spec:
 
                     /cockroach/cockroach init \
                       --certs-dir=/cockroach-certs/ \
-                      --host=cockroachdb-release-0.cockroachdb-release:26257 \
+                      --host=cockroachdb-0.cockroachdb:26257 \
                   2>&1);
 
                   local exitCode="$?";
@@ -108,7 +108,7 @@ spec:
           projected:
             sources:
             - secret:
-                name: cockroachdb-release-client-secret
+                name: cockroachdb-client-secret
                 items:
                 - key: ca.crt
                   path: ca.crt

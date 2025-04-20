@@ -1,0 +1,27 @@
+---
+# Source: dragonfly/charts/redis/templates/networkpolicy.yaml
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: dragonfly-redis
+  namespace: "dragonfly-system"
+  labels:
+    app.kubernetes.io/instance: dragonfly
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: redis
+    app.kubernetes.io/version: 7.2.5
+    helm.sh/chart: redis-19.5.5
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/instance: dragonfly
+      app.kubernetes.io/name: redis
+  policyTypes:
+    - Ingress
+    - Egress
+  egress:
+    - {}
+  ingress:
+    # Allow inbound connections
+    - ports:
+        - port: 6379

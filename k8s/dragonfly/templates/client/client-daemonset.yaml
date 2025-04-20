@@ -1,0 +1,95 @@
+---
+# Source: dragonfly/templates/client/client-daemonset.yaml
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: dragonfly-client
+  namespace: "dragonfly-system"
+  labels:
+    app: dragonfly
+    chart: dragonfly-1.3.19
+    release: dragonfly
+    heritage: Helm
+    component: client
+  annotations:
+spec:
+  selector:
+    matchLabels:
+      app: dragonfly
+      component: "client"
+      release: dragonfly
+  template:
+    metadata:
+      labels:
+        app: dragonfly
+        component: "client"
+        release: dragonfly
+      annotations:
+        checksum/config: 0969215711ea8464a5002ba2f0394274179307611924def563e53fd29bd8609b
+    spec:
+      hostNetwork: true
+      dnsPolicy: "ClusterFirstWithHostNet"
+      hostPID: true
+      hostIPC: true
+      initContainers:
+      - name: wait-for-scheduler
+        image: docker.io/busybox:latest
+        imagePullPolicy: IfNotPresent
+        command: ['sh', '-c', 'until nslookup dragonfly-scheduler.dragonfly-system.svc.cluster.local && nc -vz dragonfly-scheduler.dragonfly-system.svc.cluster.local 8002; do echo waiting for scheduler; sleep 2; done;']
+      containers:
+      - name: client
+        image: docker.io/dragonflyoss/client:v0.2.23
+        imagePullPolicy: "IfNotPresent"
+        args:
+        - --log-level=info
+        - --verbose
+        resources:
+          limits:
+            cpu: "4"
+            memory: 8Gi
+          requests:
+            cpu: "0"
+            memory: "0"
+        env:
+        ports:
+        - containerPort: 4000
+          protocol: TCP
+        - containerPort: 4003
+          protocol: TCP
+        - containerPort: 4002
+          protocol: TCP
+        - containerPort: 4004
+          protocol: TCP
+        readinessProbe:
+          exec:
+            command: ["/bin/grpc_health_probe", "-addr=unix:///var/run/dragonfly/dfdaemon.sock"]
+          initialDelaySeconds: 5
+          periodSeconds: 30
+          timeoutSeconds: 5
+        livenessProbe:
+          exec:
+            command: ["/bin/grpc_health_probe", "-addr=unix:///var/run/dragonfly/dfdaemon.sock"]
+          initialDelaySeconds: 15
+          periodSeconds: 30
+          timeoutSeconds: 5
+        volumeMounts:
+        - name: config
+          mountPath: "/etc/dragonfly"
+        - name: socket-dir
+          mountPath: /var/run/dragonfly
+        - mountPath: /var/lib/dragonfly/
+          name: storage
+        - mountPath: /var/log/dragonfly/dfdaemon/
+          name: logs
+      volumes:
+      - name: config
+        configMap:
+          name: dragonfly-client
+      - name: socket-dir
+        hostPath:
+          path: /var/run/dragonfly
+          type: DirectoryOrCreate
+      - emptyDir: {}
+        name: storage
+      - emptyDir: {}
+        name: logs

@@ -3,18 +3,18 @@
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: cockroachdb-release-self-signer
-  namespace: "auth"
+  name: cockroachdb-self-signer
+  namespace: "cockroachdb-system"
   annotations:
     # This is what defines this resource as a hook. Without this line, the
     # job is considered part of the release.
     "helm.sh/hook": pre-install,pre-upgrade
     "helm.sh/hook-weight": "2"
-    "helm.sh/hook-delete-policy": hook-succeeded,hook-failed
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded,hook-failed
   labels:
-    helm.sh/chart: cockroachdb-14.0.5
+    helm.sh/chart: cockroachdb-16.0.6
     app.kubernetes.io/name: cockroachdb
-    app.kubernetes.io/instance: "cockroachdb-release"
+    app.kubernetes.io/instance: "cockroachdb"
     app.kubernetes.io/managed-by: "Helm"
 rules:
   - apiGroups: [""]
@@ -24,7 +24,10 @@ rules:
     resources: ["statefulsets"]
     verbs: ["get"]
     resourceNames:
-      - cockroachdb-release
+      - cockroachdb
   - apiGroups: [""]
     resources: ["pods"]
     verbs: ["delete", "get"]
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["create", "get", "update", "delete"]

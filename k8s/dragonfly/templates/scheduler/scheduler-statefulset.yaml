@@ -1,0 +1,85 @@
+---
+# Source: dragonfly/templates/scheduler/scheduler-statefulset.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: dragonfly-scheduler
+  namespace: "dragonfly-system"
+  labels:
+    app: dragonfly
+    chart: dragonfly-1.3.19
+    release: dragonfly
+    heritage: Helm
+    component: scheduler
+  annotations:
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: dragonfly
+      release: dragonfly
+      component: scheduler
+  serviceName: scheduler
+  template:
+    metadata:
+      labels:
+        app: dragonfly
+        release: dragonfly
+        component: scheduler
+      annotations:
+        checksum/config: 44ab16b7e521a6cdb20dcee63c54309c213c2fb51ebbe016c8d966036b743511
+    spec:
+      hostNetwork: false
+      initContainers:
+      - name: wait-for-manager
+        image: docker.io/busybox:latest
+        imagePullPolicy: IfNotPresent
+        command: ['sh', '-c', 'until nslookup dragonfly-manager.dragonfly-system.svc.cluster.local && nc -vz dragonfly-manager.dragonfly-system.svc.cluster.local 8080; do echo waiting for manager; sleep 2; done;']
+        resources:
+          limits:
+            cpu: "2"
+            memory: 4Gi
+          requests:
+            cpu: "0"
+            memory: "0"
+      containers:
+      - name: scheduler
+        image: docker.io/dragonflyoss/scheduler:v2.2.2-rc.0
+        imagePullPolicy: "IfNotPresent"
+        resources:
+          limits:
+            cpu: "8"
+            memory: 16Gi
+          requests:
+            cpu: "0"
+            memory: "0"
+        env:
+        ports:
+        - containerPort: 8002
+          protocol: TCP
+        - containerPort: 8000
+          protocol: TCP
+        volumeMounts:
+        - name: config
+          mountPath: "/etc/dragonfly"
+        - mountPath: /var/log/dragonfly/scheduler
+          name: logs
+        readinessProbe:
+          exec:
+            command: ["/bin/grpc_health_probe", "-addr=:8002"]
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          exec:
+            command: ["/bin/grpc_health_probe", "-addr=:8002"]
+          initialDelaySeconds: 15
+          periodSeconds: 10
+      volumes:
+      - name: config
+        configMap:
+          name: dragonfly-scheduler
+          items:
+          - key: scheduler.yaml
+            path: scheduler.yaml
+      - emptyDir: {}
+        name: logs

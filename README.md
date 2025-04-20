@@ -178,3 +178,14 @@ After submitting the form, go to the "PKCE result" section to copy the id_token.
 
 ### 11. User Registration
 To enable user registration, you need to set up an SMTP server in the ZITADEL instance. This allows for sending verification and password recovery emails, which are essential for the user registration process.
+
+# Setup Kubernetes
+
+## Helm Repositories
+```bash
+helm repo add cockroachdb https://charts.cockroachdb.com
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm repo add zitadel https://charts.zitadel.com
+helm repo add elastic https://helm.elastic.co
+helm repo update
+```

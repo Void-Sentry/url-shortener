@@ -1,0 +1,99 @@
+---
+# Source: dragonfly/templates/manager/manager-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: dragonfly
+    chart: dragonfly-1.3.19
+    release: dragonfly
+    heritage: Helm
+    component: manager
+  name: dragonfly-manager
+  namespace: "dragonfly-system"
+  annotations:
+spec:
+  strategy:
+    type: RollingUpdate
+  replicas: 3
+  selector:
+    matchLabels:
+      app: dragonfly
+      component: manager
+      release: dragonfly
+  template:
+    metadata:
+      labels:
+        app: dragonfly
+        component: manager
+        release: dragonfly
+      annotations:
+        checksum/config: 719cf92609c26ac99d5abba2240f7173a0486925a89d8ccacd5c57b9744c2fe4
+    spec:
+      hostNetwork: false
+      initContainers:
+      - name: wait-for-redis
+        image: docker.io/busybox:latest
+        imagePullPolicy: IfNotPresent
+        command: ['sh', '-c', 'until nslookup dragonfly-redis-master.dragonfly-system.svc.cluster.local && nc -vz dragonfly-redis-master.dragonfly-system.svc.cluster.local 6379; do echo waiting for redis; sleep 2; done;']
+        resources:
+          limits:
+            cpu: "2"
+            memory: 4Gi
+          requests:
+            cpu: "0"
+            memory: "0"
+      - name: wait-for-mysql
+        image: docker.io/busybox:latest
+        imagePullPolicy: IfNotPresent
+        command: ['sh', '-c', 'until nslookup dragonfly-mysql.dragonfly-system.svc.cluster.local && nc -vz dragonfly-mysql.dragonfly-system.svc.cluster.local 3306; do echo waiting for mysql; sleep 2; done;']
+        resources:
+          limits:
+            cpu: "2"
+            memory: 4Gi
+          requests:
+            cpu: "0"
+            memory: "0"
+      containers:
+      - name: manager
+        image: docker.io/dragonflyoss/manager:v2.2.2-rc.0
+        imagePullPolicy: "IfNotPresent"
+        resources:
+          limits:
+            cpu: "8"
+            memory: 16Gi
+          requests:
+            cpu: "0"
+            memory: "0"
+        env:
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        - containerPort: 65003
+          protocol: TCP
+        - containerPort: 8000
+          protocol: TCP
+        volumeMounts:
+        - name: config
+          mountPath: "/etc/dragonfly"
+        - mountPath: /var/log/dragonfly/manager
+          name: logs
+        readinessProbe:
+          exec:
+            command: ["/bin/grpc_health_probe", "-addr=:65003"]
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          exec:
+            command: ["/bin/grpc_health_probe", "-addr=:65003"]
+          initialDelaySeconds: 15
+          periodSeconds: 10
+      volumes:
+      - name: config
+        configMap:
+          name: dragonfly-manager
+          items:
+          - key: manager.yaml
+            path: manager.yaml
+      - emptyDir: {}
+        name: logs

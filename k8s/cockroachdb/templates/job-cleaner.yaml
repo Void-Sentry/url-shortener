@@ -3,27 +3,27 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: cockroachdb-release-self-signer-cleaner
-  namespace: "auth"
+  name: cockroachdb-self-signer-cleaner
+  namespace: "cockroachdb-system"
   annotations:
     # This is what defines this resource as a hook. Without this line, the
     # job is considered part of the release.
     "helm.sh/hook": pre-delete
-    "helm.sh/hook-delete-policy": hook-succeeded,hook-failed
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded,hook-failed
   labels:
-    helm.sh/chart: cockroachdb-14.0.5
+    helm.sh/chart: cockroachdb-16.0.6
     app.kubernetes.io/name: cockroachdb
-    app.kubernetes.io/instance: "cockroachdb-release"
+    app.kubernetes.io/instance: "cockroachdb"
     app.kubernetes.io/managed-by: "Helm"
 spec:
   backoffLimit: 1
   template:
     metadata:
-      name: cockroachdb-release-self-signer-cleaner
+      name: cockroachdb-self-signer-cleaner
       labels:
-        helm.sh/chart: cockroachdb-14.0.5
+        helm.sh/chart: cockroachdb-16.0.6
         app.kubernetes.io/name: cockroachdb
-        app.kubernetes.io/instance: "cockroachdb-release"
+        app.kubernetes.io/instance: "cockroachdb"
         app.kubernetes.io/managed-by: "Helm"
     spec:
       securityContext:
@@ -36,16 +36,16 @@ spec:
       restartPolicy: Never
       containers:
         - name: cleaner
-          image: "gcr.io/cockroachlabs-helm-charts/cockroach-self-signer-cert:1.5"
+          image: "gcr.io/cockroachlabs-helm-charts/cockroach-self-signer-cert:1.7"
           imagePullPolicy: "IfNotPresent"
           args:
             - cleanup
-            - --namespace=auth
+            - --namespace=cockroachdb-system
           env:
           - name: STATEFULSET_NAME
-            value: cockroachdb-release
+            value: cockroachdb
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
               drop: ["ALL"]
-      serviceAccountName: cockroachdb-release-rotate-self-signer
+      serviceAccountName: cockroachdb-rotate-self-signer

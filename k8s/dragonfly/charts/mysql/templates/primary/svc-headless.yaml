@@ -1,0 +1,26 @@
+---
+# Source: dragonfly/charts/mysql/templates/primary/svc-headless.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: dragonfly-mysql-headless
+  namespace: "dragonfly-system"
+  labels:
+    app.kubernetes.io/instance: dragonfly
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: mysql
+    app.kubernetes.io/version: 8.0.36
+    helm.sh/chart: mysql-10.1.1
+    app.kubernetes.io/component: primary
+spec:
+  type: ClusterIP
+  clusterIP: None
+  publishNotReadyAddresses: true
+  ports:
+    - name: mysql
+      port: 3306
+      targetPort: mysql
+  selector:
+    app.kubernetes.io/instance: dragonfly
+    app.kubernetes.io/name: mysql
+    app.kubernetes.io/component: primary

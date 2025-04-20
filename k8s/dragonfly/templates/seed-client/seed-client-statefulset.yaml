@@ -1,0 +1,104 @@
+---
+# Source: dragonfly/templates/seed-client/seed-client-statefulset.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: dragonfly
+    chart: dragonfly-1.3.19
+    release: dragonfly
+    heritage: Helm
+    component: seed-client
+  name: dragonfly-seed-client
+  namespace: "dragonfly-system"
+  annotations:
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: dragonfly
+      component: seed-client
+      release: dragonfly
+  serviceName: seed-client
+  template:
+    metadata:
+      labels:
+        app: dragonfly
+        component: seed-client
+        release: dragonfly
+      annotations:
+        checksum/config: 9d53ce29bd657f4117ba36037b0d4414b7a9722c93c9afba8cd7b42546595802
+    spec:
+      hostNetwork: false
+      initContainers:
+      - name: wait-for-manager
+        image: docker.io/busybox:latest
+        imagePullPolicy: IfNotPresent
+        command: ['sh', '-c', 'until nslookup dragonfly-manager.dragonfly-system.svc.cluster.local && nc -vz dragonfly-manager.dragonfly-system.svc.cluster.local 8080; do echo waiting for manager; sleep 2; done;']
+        resources:
+          limits:
+            cpu: "2"
+            memory: 4Gi
+          requests:
+            cpu: "0"
+            memory: "0"
+      containers:
+      - name: seed-client
+        image: docker.io/dragonflyoss/client:v0.2.23
+        imagePullPolicy: "IfNotPresent"
+        args:
+        - --log-level=info
+        - --verbose
+        resources:
+          limits:
+            cpu: "8"
+            memory: 16Gi
+          requests:
+            cpu: "0"
+            memory: "0"
+        env:
+        ports:
+        - containerPort: 4000
+          protocol: TCP
+        - containerPort: 4001
+          protocol: TCP
+        - containerPort: 4003
+          protocol: TCP
+        - containerPort: 4002
+          protocol: TCP
+        - containerPort: 4004
+          protocol: TCP
+        readinessProbe:
+          exec:
+            command: ["/bin/grpc_health_probe", "-addr=unix:///var/run/dragonfly/dfdaemon.sock"]
+          initialDelaySeconds: 5
+          periodSeconds: 30
+          timeoutSeconds: 5
+        livenessProbe:
+          exec:
+            command: ["/bin/grpc_health_probe", "-addr=unix:///var/run/dragonfly/dfdaemon.sock"]
+          initialDelaySeconds: 15
+          periodSeconds: 30
+          timeoutSeconds: 5
+        volumeMounts:
+        - name: config
+          mountPath: "/etc/dragonfly"
+        - name: storage
+          mountPath: /var/lib/dragonfly/
+        - mountPath: /var/log/dragonfly/dfdaemon/
+          name: logs
+      volumes:
+      - name: config
+        configMap:
+          name: dragonfly-seed-client
+      - emptyDir: {}
+        name: logs
+  volumeClaimTemplates:
+    - metadata:
+        name: storage
+      spec:
+        accessModes:
+          - "ReadWriteOnce"
+        resources:
+          requests:
+            storage: "100Gi"

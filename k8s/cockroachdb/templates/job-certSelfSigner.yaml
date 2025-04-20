@@ -3,27 +3,27 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: cockroachdb-release-self-signer
-  namespace: "auth"
+  name: cockroachdb-self-signer
+  namespace: "cockroachdb-system"
   annotations:
     # This is what defines this resource as a hook. Without this line, the
     # job is considered part of the release.
     "helm.sh/hook": pre-install,pre-upgrade
     "helm.sh/hook-weight": "4"
-    "helm.sh/hook-delete-policy": hook-succeeded,hook-failed
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded,hook-failed
   labels:
-    helm.sh/chart: cockroachdb-14.0.5
+    helm.sh/chart: cockroachdb-16.0.6
     app.kubernetes.io/name: cockroachdb
-    app.kubernetes.io/instance: "cockroachdb-release"
+    app.kubernetes.io/instance: "cockroachdb"
     app.kubernetes.io/managed-by: "Helm"
 spec:
   template:
     metadata:
-      name: cockroachdb-release-self-signer
+      name: cockroachdb-self-signer
       labels:
-        helm.sh/chart: cockroachdb-14.0.5
+        helm.sh/chart: cockroachdb-16.0.6
         app.kubernetes.io/name: cockroachdb
-        app.kubernetes.io/instance: "cockroachdb-release"
+        app.kubernetes.io/instance: "cockroachdb"
         app.kubernetes.io/managed-by: "Helm"
     spec:
       securityContext:
@@ -36,7 +36,7 @@ spec:
       restartPolicy: Never
       containers:
         - name: cert-generate-job
-          image: "gcr.io/cockroachlabs-helm-charts/cockroach-self-signer-cert:1.5"
+          image: "gcr.io/cockroachlabs-helm-charts/cockroach-self-signer-cert:1.7"
           imagePullPolicy: "IfNotPresent"
           args:
             - generate
@@ -48,13 +48,13 @@ spec:
             - --node-expiry=168h
           env:
           - name: STATEFULSET_NAME
-            value: cockroachdb-release
+            value: cockroachdb
           - name: NAMESPACE
-            value: "auth"
+            value: "cockroachdb-system"
           - name: CLUSTER_DOMAIN
             value: cluster.local
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
               drop: ["ALL"]
-      serviceAccountName: cockroachdb-release-self-signer
+      serviceAccountName: cockroachdb-self-signer
