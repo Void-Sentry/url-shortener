@@ -1,0 +1,7 @@
+# overlays/dev/patch-injector-enabled.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vault-agent-injector
+spec:
+  replicas: 1

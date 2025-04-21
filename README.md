@@ -183,6 +183,7 @@ To enable user registration, you need to set up an SMTP server in the ZITADEL in
 
 ## Helm Repositories
 ```bash
+helm repo add hashicorp https://helm.releases.hashicorp.com
 helm repo add cockroachdb https://charts.cockroachdb.com
 helm repo add bitnami https://charts.bitnami.com/bitnami
 helm repo add zitadel https://charts.zitadel.com

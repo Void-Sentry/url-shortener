@@ -1,0 +1,16 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - vault/templates/injector-clusterrolebinding.yaml
+  - vault/templates/injector-clusterrole.yaml
+  - vault/templates/injector-deployment.yaml
+  - vault/templates/injector-mutating-webhook.yaml
+  - vault/templates/injector-serviceaccount.yaml
+  - vault/templates/injector-service.yaml
+  - vault/templates/server-clusterrolebinding.yaml
+  - vault/templates/server-config-configmap.yaml
+  - vault/templates/server-headless-service.yaml
+  - vault/templates/server-serviceaccount.yaml
+  - vault/templates/server-service.yaml
+  - vault/templates/server-statefulset.yaml
+  # - vault/templates/tests/server-test.yaml
